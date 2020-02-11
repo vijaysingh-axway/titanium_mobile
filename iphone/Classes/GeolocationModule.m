@@ -8,7 +8,7 @@
 
 #import "GeolocationModule.h"
 #import "TiUtils+Addons.h"
-#import <TitaniumKit/APSHTTPClient.h>
+#import <APSHTTPClient/APSHTTPClient.h>
 #import <TitaniumKit/NSData+Additions.h>
 #import <TitaniumKit/TiApp.h>
 

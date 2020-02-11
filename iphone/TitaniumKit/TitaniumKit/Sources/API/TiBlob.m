@@ -440,10 +440,10 @@ GETTER_IMPL(NSUInteger, length, Length);
 - (NSString *)toString
 {
   NSString *t = [self text];
-  if (t != nil) {
+  //if (t != nil) {
     return t;
-  }
-  return [super toString];
+ // }
+ // return [super toString];
 }
 
 @end

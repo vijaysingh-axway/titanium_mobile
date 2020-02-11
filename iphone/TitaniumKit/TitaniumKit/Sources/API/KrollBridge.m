@@ -5,7 +5,9 @@
  * Please see the LICENSE included with this distribution for details.
  */
 #import "KrollBridge.h"
+#if !TARGET_OS_MACCATALYST
 #import "APSAnalytics.h"
+#endif
 #import "KrollCallback.h"
 #import "TiApp.h"
 #import "TiConsole.h"
@@ -512,6 +514,7 @@ CFMutableSetRef krollBridgeRegistry = nil;
 
   // FIXME Re-enable analytics setters here
   if ([[TiSharedConfig defaultConfig] isAnalyticsEnabled]) {
+    #if !TARGET_OS_MACCATALYST
     APSAnalytics *sharedAnalytics = [APSAnalytics sharedInstance];
     NSString *buildType = [[TiSharedConfig defaultConfig] applicationBuildType];
     NSString *deployType = [[TiSharedConfig defaultConfig] applicationDeployType];
@@ -521,6 +524,7 @@ CFMutableSetRef krollBridgeRegistry = nil;
     }
     [sharedAnalytics performSelector:@selector(setSDKVersion:) withObject:[module performSelector:@selector(version)]];
     [sharedAnalytics enableWithAppKey:guid andDeployType:deployType];
+#endif
   }
 
   // Load the "console" object into the global scope

@@ -6,7 +6,9 @@
  */
 
 #import "TiExceptionHandler.h"
+#if !TARGET_OS_MACCATALYST
 #import "APSAnalytics.h"
+#endif
 #import "TiApp.h"
 #import "TiBase.h"
 
@@ -240,8 +242,9 @@ static void TiUncaughtExceptionHandler(NSException *exception)
   insideException = YES;
 
   [[TiExceptionHandler defaultExceptionHandler] reportException:exception];
+  #if !TARGET_OS_MACCATALYST
   [[APSAnalytics sharedInstance] flush];
-
+#endif
   insideException = NO;
   if (prevUncaughtExceptionHandler != NULL) {
     prevUncaughtExceptionHandler(exception);
@@ -263,6 +266,8 @@ static void TiSignalHandler(int code)
   }
   NSException *exception = [NSException exceptionWithName:@"SIGNAL_ERROR" reason:[NSString stringWithFormat:@"signal error code: %d", code] userInfo:nil];
   [[TiExceptionHandler defaultExceptionHandler] reportException:exception];
+  #if !TARGET_OS_MACCATALYST
   [[APSAnalytics sharedInstance] flush];
+#endif
   signal(code, SIG_DFL);
 }

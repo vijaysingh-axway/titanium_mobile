@@ -5,6 +5,7 @@
  * Please see the LICENSE included with this distribution for details.
  */
 #ifdef USE_TI_APPIOS
+#if defined(USE_TI_APPIOSUSERNOTIFICATIONCENTER) && !TARGET_OS_MACCATALYST
 
 #import <TitaniumKit/TiApp.h>
 #import <TitaniumKit/TiProxy.h>
@@ -24,4 +25,5 @@
 - (void)requestUserNotificationSettings:(id)args;
 
 @end
+#endif
 #endif

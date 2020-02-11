@@ -13,7 +13,8 @@ const appc = require('node-appc'),
 	ioslib = require('ioslib'),
 	i18n = appc.i18n(__dirname),
 	__ = i18n.__,
-	__n = i18n.__n;
+	__n = i18n.__n,
+	exec = require('child_process').exec;
 
 exports.cliVersion = '>=3.2';
 
@@ -21,6 +22,14 @@ exports.init = function (logger, config, cli) {
 	cli.addHook('build.post.compile', {
 		priority: 10000,
 		post: function (builder, finished) {
+			if (cli.argv.target === 'maccatalyst') {
+				logger.info(__('Launching Mac'));
+				const command = 'open -a ' + builder.iosBuildDir + '/' + builder.tiapp.name + '.app/Contents/MacOS/'+ builder.tiapp.name;
+				console.log('command is ' +command);
+
+				exec(command, function() {});
+				return finished();
+			}
 			if (cli.argv.target !== 'simulator') {
 				return finished();
 			}
@@ -32,6 +41,7 @@ exports.init = function (logger, config, cli) {
 
 			logger.info(__('Launching iOS Simulator'));
 
+			
 			let simStarted = false,
 				lastLogger = 'debug';
 			const startLogTxt = __('Start simulator log'),

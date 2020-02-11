@@ -1388,7 +1388,7 @@ TI_INLINE void waitForMemoryPanicCleared(void); //WARNING: This must never be ru
 
   // Inject the trigger (time- or location-based) into the payload
   UNNotificationTrigger *trigger = notification.request.trigger;
-
+#if !TARGET_OS_MACCATALYST
   if (trigger != nil) {
     if ([trigger isKindOfClass:[UNCalendarNotificationTrigger class]]) {
       [event setObject:NULL_IF_NIL([(UNCalendarNotificationTrigger *)trigger nextTriggerDate]) forKey:@"date"];
@@ -1403,7 +1403,7 @@ TI_INLINE void waitForMemoryPanicCleared(void); //WARNING: This must never be ru
       [event setObject:dict forKey:@"region"];
     }
   }
-
+#endif
   return event;
 }
 

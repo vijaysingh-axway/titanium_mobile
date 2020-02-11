@@ -59,11 +59,12 @@ function iOSBuilder() {
 		simulator: 'development',
 		device: 'test',
 		'dist-appstore': 'production',
-		'dist-adhoc': 'production'
+		'dist-adhoc': 'production',
+		'maccatalyst': 'development'
 	};
 
 	// list of available build-targets
-	this.targets = [ 'simulator', 'device', 'dist-appstore', 'dist-adhoc' ];
+	this.targets = [ 'simulator', 'device', 'dist-appstore', 'dist-adhoc', 'maccatalyst' ];
 
 	// object of device families to map the --device-family parameter to the
 	// native TARGETED_DEVICE_FAMILY build-setting
@@ -336,6 +337,8 @@ iOSBuilder.prototype.getDeviceInfo = function getDeviceInfo() {
 					}
 				}, this);
 			}, this);
+	} else if (argv.target === 'maccatalyst') {
+		deviceInfo.devices = {};
 	}
 
 	return this.deviceInfoCache = deviceInfo;
@@ -1168,7 +1171,7 @@ iOSBuilder.prototype.configOptionPPuuid = function configOptionPPuuid(order) {
 		validate: function (value, callback) {
 			const target = cli.argv.target;
 
-			if (target === 'simulator') {
+			if (target === 'simulator' || target === 'maccatalyst') {
 				return callback(null, value);
 			}
 
@@ -1221,13 +1224,15 @@ iOSBuilder.prototype.configOptionTarget = function configOptionTarget(order) {
 	return {
 		abbr: 'T',
 		callback: function (value) {
-			if (value !== 'simulator') {
+			if (value !== 'simulator' || value !== 'maccatalyst') {
 				_t.assertIssue(iosInfo.issues, 'IOS_NO_KEYCHAINS_FOUND');
 				_t.assertIssue(iosInfo.issues, 'IOS_NO_WWDR_CERT_FOUND');
 			}
 
 			// as soon as we know the target, toggle required options for validation
 			switch (value) {
+				case 'maccatalyst':
+				      break;
 				case 'device':
 					_t.assertIssue(iosInfo.issues, 'IOS_NO_VALID_DEV_CERTS_FOUND');
 					_t.assertIssue(iosInfo.issues, 'IOS_NO_VALID_DEVELOPMENT_PROVISIONING_PROFILES');
@@ -1665,7 +1670,7 @@ iOSBuilder.prototype.initTiappSettings = function initTiappSettings() {
 				return true;
 			});
 
-			if (cli.argv.target !== 'simulator') {
+			if (cli.argv.target !== 'simulator' || cli.argv.target !== 'maccatalyst') {
 				// check that all target provisioning profile uuids are valid
 				if (!tiappTargets[targetName].ppUUIDs || !tiappTargets[targetName].ppUUIDs[cli.argv.target]) {
 					if (cli.argv['pp-uuid']) {
@@ -1882,7 +1887,7 @@ iOSBuilder.prototype.validate = function validate(logger, config, cli) {
 		}, this);
 
 		// if in the prepare phase and doing a device/dist build...
-		if (cli.argv.target !== 'simulator') {
+		if (cli.argv.target !== 'simulator' || cli.argv.target !== 'maccatalyst') {
 			// make sure they have Apple's WWDR cert installed
 			if (!this.iosInfo.certs.wwdr) {
 				logger.error(__('WWDR Intermediate Certificate not found') + '\n');
@@ -2427,11 +2432,20 @@ iOSBuilder.prototype.initialize = function initialize() {
 	this.deviceId      = argv['device-id'];
 	this.deviceInfo    = this.deviceId ? this.getDeviceInfo().udids[this.deviceId] : null;
 	this.xcodeTarget   = /^device|simulator$/.test(this.target) ? 'Debug' : 'Release';
-	this.xcodeTargetOS = this.target === 'simulator' ? 'iphonesimulator' : 'iphoneos';
+
+	if (this.target === 'maccatalyst') {
+		this.xcodeTargetOS = 'maccatalyst';
+	} else if (this.target === 'simulator') {
+		this.xcodeTargetOS = 'iphonesimulator';
+	} else {
+		this.xcodeTargetOS = 'iphoneos';
+	}
 
 	this.iosBuildDir            = path.join(this.buildDir, 'build', 'Products', this.xcodeTarget + '-' + this.xcodeTargetOS);
 	if (this.target === 'dist-appstore' || this.target === 'dist-adhoc') {
 		this.xcodeAppDir        = path.join(this.buildDir, 'ArchiveStaging');
+	} else if (this.xcodeTargetOS === 'maccatalyst') {
+		this.xcodeAppDir        = path.join(this.iosBuildDir, this.tiapp.name + '.app/Contents/Resources');
 	} else {
 		this.xcodeAppDir        = path.join(this.iosBuildDir, this.tiapp.name + '.app');
 	}
@@ -2586,6 +2600,8 @@ iOSBuilder.prototype.loginfo = function loginfo() {
 		this.logger.debug(__('Simulator version: %s', cyan(this.simHandle.version)));
 	} else if (this.target === 'device') {
 		this.logger.info(__('Building for iOS device: %s', cyan(this.deviceId)));
+	} else if (this.target === 'maccatalyst') {
+		this.logger.info(__('Building for maccatalyst'));
 	}
 
 	this.logger.info(__('Building for device family: %s', cyan(this.deviceFamily)));
@@ -3102,7 +3118,7 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 		legacySwift = version.lt(this.xcodeEnv.version, '8.0.0');
 
 	// set additional build settings
-	if (this.target === 'simulator') {
+	if (this.target === 'simulator' || this.target === 'maccatalyst') {
 		gccDefs.push('__LOG__ID__=' + this.tiapp.guid);
 		gccDefs.push('DEBUG=1');
 		gccDefs.push('TI_VERSION=' + this.titaniumSdkVersion);
@@ -3165,6 +3181,10 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 	} else if (this.target === 'device') {
 		buildSettings.CODE_SIGN_IDENTITY = `"${this.certDeveloperName}"`;
 		buildSettings.CODE_SIGN_STYLE = 'Manual';
+	} else if (this.target === 'maccatalyst') {
+		//TO DO: Change this hardcoded
+		buildSettings.CODE_SIGN_IDENTITY = '"Apple Development"';
+		buildSettings.CODE_SIGN_STYLE = 'Automatic';
 	}
 
 	// inject the team id and app groups
@@ -3190,14 +3210,21 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 		const buildSettings = xobjs.XCBuildConfiguration[buildConf.value].buildSettings;
 		buildSettings.IPHONEOS_DEPLOYMENT_TARGET = appc.version.format(this.minIosVer, 2);
 		delete buildSettings['"CODE_SIGN_IDENTITY[sdk=iphoneos*]"'];
+		delete buildSettings['"CODE_SIGN_IDENTITY[sdk=macosx*]"'];
 	}, this);
 
 	// set the target-specific build settings
 	xobjs.XCConfigurationList[xobjs.PBXNativeTarget[mainTargetUuid].buildConfigurationList].buildConfigurations.forEach(function (buildConf) {
 		const bs = appc.util.mix(xobjs.XCBuildConfiguration[buildConf.value].buildSettings, buildSettings);
 		delete bs['"CODE_SIGN_IDENTITY[sdk=iphoneos*]"'];
+		delete bs['"CODE_SIGN_IDENTITY[sdk=macosx*]"'];
 
 		bs.PRODUCT_BUNDLE_IDENTIFIER = '"' + this.tiapp.id + '"';
+
+		if (this.target === 'maccatalyst') {
+			//TO DO: Change it
+		    bs.DEVELOPMENT_TEAM = this.tiapp.ios['team-id'];
+		}
 
 		if (this.provisioningProfile) {
 			bs.DEVELOPMENT_TEAM = this.teamId;
@@ -3291,7 +3318,8 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 			xobjs.PBXBuildFile[buildFileUuid] = {
 				isa: 'PBXBuildFile',
 				fileRef: fileRefUuid,
-				fileRef_comment: lib.libName
+				fileRef_comment: lib.libName,
+				platformFilter: 'ios'
 			};
 			xobjs.PBXBuildFile[buildFileUuid + '_comment'] = lib.libName + ' in Frameworks';
 
@@ -3788,19 +3816,19 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 
 	xobjs.PBXFileReference[frameworkFileRefUuid] = {
 		isa: 'PBXFileReference',
-		lastKnownFileType: 'wrapper.framework',
-		name: '"TitaniumKit.framework"',
-		path: '"Frameworks/TitaniumKit.framework"',
+		lastKnownFileType: 'wrapper.xcframework',
+		name: '"TitaniumKit.xcframework"',
+		path: '"Frameworks/TitaniumKit.xcframework"',
 		sourceTree: '"<group>"'
 	};
-	xobjs.PBXFileReference[frameworkFileRefUuid + '_comment'] = 'TitaniumKit.framework';
+	xobjs.PBXFileReference[frameworkFileRefUuid + '_comment'] = 'TitaniumKit.xcframework';
 
 	xobjs.PBXBuildFile[frameworkBuildFileUuid] = {
 		isa: 'PBXBuildFile',
 		fileRef: frameworkFileRefUuid,
-		fileRef_comment: 'TitaniumKit.framework'
+		fileRef_comment: 'TitaniumKit.xcframework'
 	};
-	xobjs.PBXBuildFile[frameworkBuildFileUuid + '_comment'] = 'TitaniumKit.framework in Frameworks';
+	xobjs.PBXBuildFile[frameworkBuildFileUuid + '_comment'] = 'TitaniumKit.xcframework in Frameworks';
 
 	frameworksBuildPhase.files.push({
 		value: frameworkBuildFileUuid,
@@ -3810,10 +3838,10 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 	xobjs.PBXBuildFile[embedFrameworkBuildFileUuid] = {
 		isa: 'PBXBuildFile',
 		fileRef: frameworkFileRefUuid,
-		fileRef_comment: 'TitaniumKit.framework',
-		settings: { ATTRIBUTES: [ 'CodeSignOnCopy', 'RemoveHeadersOnCopy' ] }
+		fileRef_comment: 'TitaniumKit.xcframework',
+		settings: { ATTRIBUTES: [ 'CodeSignOnCopy' ] }
 	};
-	xobjs.PBXBuildFile[embedFrameworkBuildFileUuid + '_comment'] = 'TitaniumKit.framework in Embed Frameworks';
+	xobjs.PBXBuildFile[embedFrameworkBuildFileUuid + '_comment'] = 'TitaniumKit.xcframework in Embed Frameworks';
 
 	copyFilesBuildPhase.files.push({
 		value: embedFrameworkBuildFileUuid,
@@ -3822,7 +3850,51 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 
 	frameworksGroup.children.push({
 		value: frameworkFileRefUuid,
-		comment: 'TitaniumKit.framework'
+		comment: 'TitaniumKit.xcframework'
+	});
+
+	// add APSHTTPClient.xcframework
+	const apsFrameworkFileRefUuid = this.generateXcodeUuid(xcodeProject);
+	const apsFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+	const apsEmbedFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+
+	xobjs.PBXFileReference[apsFrameworkFileRefUuid] = {
+		isa: 'PBXFileReference',
+		lastKnownFileType: 'wrapper.xcframework',
+		name: '"APSHTTPClient.xcframework"',
+		path: '"Frameworks/APSHTTPClient.xcframework"',
+		sourceTree: '"<group>"'
+	};
+	xobjs.PBXFileReference[apsFrameworkFileRefUuid + '_comment'] = 'APSHTTPClient.xcframework';
+
+	xobjs.PBXBuildFile[apsFrameworkBuildFileUuid] = {
+		isa: 'PBXBuildFile',
+		fileRef: apsFrameworkFileRefUuid,
+		fileRef_comment: 'APSHTTPClient.xcframework'
+	};
+	xobjs.PBXBuildFile[apsFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Frameworks';
+
+	frameworksBuildPhase.files.push({
+		value: apsFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[apsFrameworkBuildFileUuid + '_comment']
+	});
+
+	xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid] = {
+		isa: 'PBXBuildFile',
+		fileRef: apsFrameworkFileRefUuid,
+		fileRef_comment: 'APSHTTPClient.xcframework',
+		settings: { ATTRIBUTES: [ 'CodeSignOnCopy', ] }
+	};
+	xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Embed Frameworks';
+
+	copyFilesBuildPhase.files.push({
+		value: apsEmbedFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid + '_comment']
+	});
+
+	frameworksGroup.children.push({
+		value: apsFrameworkFileRefUuid,
+		comment: 'APSHTTPClient.xcframework'
 	});
 
 	// run the xcode project hook
@@ -6442,7 +6514,7 @@ iOSBuilder.prototype.processTiSymbols = function processTiSymbols() {
 	}
 	// if we're doing a simulator build or we're including all titanium modules,
 	// return now since we don't care about writing the defines.h
-	if (this.target === 'simulator' || this.includeAllTiModules) {
+	if (this.target === 'simulator' || this.target === 'maccatalyst' || this.includeAllTiModules) {
 		const definesFile = path.join(this.platformPath, 'Classes', 'defines.h');
 
 		contents = fs.readFileSync(definesFile).toString();
@@ -6558,9 +6630,9 @@ iOSBuilder.prototype.removeFiles = function removeFiles(next) {
 
 		// remove invalid architectures from TitaniumKit.framework for App Store distributions
 		if (this.target === 'dist-appstore' || this.target === 'dist-adhoc') {
-			this.logger.info(__('Removing invalid architectures from TitaniumKit.framework'));
+			this.logger.info(__('Removing invalid architectures from TitaniumKit.xcframework'));
 
-			const titaniumKitPath = path.join(this.buildDir, 'Frameworks', 'TitaniumKit.framework', 'TitaniumKit');
+			const titaniumKitPath = path.join(this.buildDir, 'Frameworks', 'TitaniumKit.xcframework', 'TitaniumKit');
 			async.eachSeries([ 'x86_64', 'i386' ], function (architecture, next) {
 				const args = [ '-remove', architecture, titaniumKitPath, '-o', titaniumKitPath ];
 				this.logger.debug(__('Running: %s', (this.xcodeEnv.executables.lipo + ' ' + args.join(' ')).cyan));
@@ -6583,7 +6655,7 @@ iOSBuilder.prototype.removeFiles = function removeFiles(next) {
 
 iOSBuilder.prototype.optimizeFiles = function optimizeFiles(next) {
 	// if we're doing a simulator build, return now since we don't care about optimizing images
-	if (this.target === 'simulator') {
+	if (this.target === 'simulator' || this.target === 'maccatalyst') {
 		return next();
 	}
 
@@ -6820,13 +6892,17 @@ iOSBuilder.prototype.invokeXcodeBuild = function invokeXcodeBuild(next) {
 		'SYMROOT=' + path.join(this.buildDir, 'build', 'Products'),
 	];
 
-	if (this.simHandle) {
+	if (this.simHandle && this.xcodeTargetOS !== 'maccatalyst') {
 		args.push('-destination', 'generic/platform=iOS Simulator');
 
 		// only build active architecture, which is 64-bit, if simulator is not 32-bit (iPhone 5s or newer, iPhone 5 and older are not 64-bit)
 		if (this.simOnlyActiveArch) {
 			args.push('ONLY_ACTIVE_ARCH=1');
 		}
+	}
+
+	if(this.xcodeTargetOS === 'maccatalyst') {
+	   args.push('SUPPORTS_MACCATALYST=YES');
 	}
 
 	xcodebuildHook(

@@ -8,7 +8,7 @@
 #ifdef USE_TI_NETWORK
 
 #import "TiDOMDocumentProxy.h"
-#import <TitaniumKit/APSHTTPClient.h>
+#import <APSHTTPClient/APSHTTPClient.h>
 #import <TitaniumKit/TiProxy.h>
 
 @class TiBlob;
@@ -19,7 +19,7 @@
 - (id<APSConnectionDelegate>)connectionDelegateForUrl:(NSURL *)url;
 @end
 
-@interface TiNetworkHTTPClientProxy : TiProxy <APSHTTPRequestDelegate> {
+@interface TiNetworkHTTPClientProxy : TiProxy <APSHTTPRequestDelegate>  {
   APSHTTPRequest *httpRequest;
   NSTimeInterval _uploadTime;
   NSTimeInterval _downloadTime;
