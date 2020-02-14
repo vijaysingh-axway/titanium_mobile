@@ -29,8 +29,12 @@ NSString *const TI_APPLICATION_COPYRIGHT = @"Appcelerator";
 NSString *const TI_APPLICATION_GUID = @"25FE4B6E-7DA9-4344-B55B-25195570860F";
 BOOL const TI_APPLICATION_ANALYTICS = YES;
 BOOL const TI_APPLICATION_SHOW_ERROR_CONTROLLER = YES;
-NSString *const TI_APPLICATION_RESOURCE_DIR = @"/Contents/Resources";
 NSString *const TI_APPLICATION_BUILD_TYPE = @"";
+#if !TARGET_OS_MACCATALYST
+NSString *const TI_APPLICATION_RESOURCE_DIR = @"";
+#else
+NSString *const TI_APPLICATION_RESOURCE_DIR = @"/Contents/Resources";
+#endif
 
 // Currently unused
 NSString *const TI_APPLICATION_SDK_VERSION = @"8.0.0";

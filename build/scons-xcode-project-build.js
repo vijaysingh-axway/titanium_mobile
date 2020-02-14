@@ -16,13 +16,12 @@ const targetBuildDir = program.args[1];
 const productName = program.args[2];
 
 const ROOT_DIR = path.join(__dirname, '..');
-//TO DO: Use if condition to differentiate to iOS and mac
 
-//#if !TARGET_OS_MACCATALYST
-//const appDir = path.join(targetBuildDir, `${productName}.app`);
-//#else
-const appDir = path.join(targetBuildDir, `${productName}.app`, 'Contents/Resources');
-//#endif
+var appDir = path.join(targetBuildDir, `${productName}.app`);
+if (targetBuildDir.includes('mac') === true) {
+	appDir = path.join(targetBuildDir, `${productName}.app`, 'Contents/Resources');
+}
+
 const xcodeProjectResources = path.join(projectDir, '../Resources');
 const localeCompiler = path.join(ROOT_DIR, 'support/dev/localecompiler.py');
 

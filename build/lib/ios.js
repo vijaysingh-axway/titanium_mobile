@@ -98,7 +98,7 @@ class IOS {
 		}));
 
 		// re-arrange redirecting headers for iphone/TitaniumKit/TitankumKit/Libraries/*/*.h files
-		const libDirs = await fs.readdir(path.join(IOS_ROOT, 'TitaniumKit/TitaniumKit/Libraries'));
+	/*	const libDirs = await fs.readdir(path.join(IOS_ROOT, 'TitaniumKit/TitaniumKit/Libraries'));
 		for (const libDir of libDirs) {
 			const fullLibDir = path.join(IOS_ROOT, 'TitaniumKit/TitaniumKit/Libraries', libDir);
 			if (!(await fs.lstat(fullLibDir)).isDirectory()) { // if not a directory (like .DS_Store), move on
@@ -112,7 +112,7 @@ class IOS {
 				}
 			}
 		}
-
+    */
 		// Create redirecting headers in iphone/include/ pointing to iphone/Classes/ headers
 		// TODO: Use map and Promise.all to run these in parallel
 		const classesHeaders = await glob('**/*.h', { cwd: path.join(IOS_ROOT, 'Classes') });
@@ -144,6 +144,9 @@ class IOS {
 
 			// Copy APSHTTPClient
 			copyFiles(path.join(IOS_ROOT, 'TitaniumKit/TitaniumKit/Libraries'), path.join(DEST_IOS, 'Frameworks'), [ 'APSHTTPClient.xcframework' ]),
+
+			// Copy APSAnalytics
+			copyFiles(path.join(IOS_ROOT, 'TitaniumKit/TitaniumKit/Libraries'), path.join(DEST_IOS, 'Frameworks'), [ 'APSAnalytics.xcframework' ]),
 
 			// Copy and inject values for special source files
 			this.injectSDKConstants(path.join(DEST_IOS, 'main.m')),

@@ -1,0 +1,6 @@
+framework module APSAnalytics {
+  umbrella header "APSAnalytics.h"
+
+  export *
+  module * { export * }
+}

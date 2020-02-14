@@ -3878,47 +3878,91 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 	});
 
 	// add APSHTTPClient.xcframework
-	const apsFrameworkFileRefUuid = this.generateXcodeUuid(xcodeProject);
-	const apsFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
-	const apsEmbedFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+	const httpClientFrameworkFileRefUuid = this.generateXcodeUuid(xcodeProject);
+	const httpClientFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+	const httpClientEmbedFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
 
-	xobjs.PBXFileReference[apsFrameworkFileRefUuid] = {
+	xobjs.PBXFileReference[httpClientFrameworkFileRefUuid] = {
 		isa: 'PBXFileReference',
 		lastKnownFileType: 'wrapper.xcframework',
 		name: '"APSHTTPClient.xcframework"',
 		path: '"Frameworks/APSHTTPClient.xcframework"',
 		sourceTree: '"<group>"'
 	};
-	xobjs.PBXFileReference[apsFrameworkFileRefUuid + '_comment'] = 'APSHTTPClient.xcframework';
+	xobjs.PBXFileReference[httpClientFrameworkFileRefUuid + '_comment'] = 'APSHTTPClient.xcframework';
 
-	xobjs.PBXBuildFile[apsFrameworkBuildFileUuid] = {
+	xobjs.PBXBuildFile[httpClientFrameworkBuildFileUuid] = {
 		isa: 'PBXBuildFile',
-		fileRef: apsFrameworkFileRefUuid,
+		fileRef: httpClientFrameworkFileRefUuid,
 		fileRef_comment: 'APSHTTPClient.xcframework'
 	};
-	xobjs.PBXBuildFile[apsFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Frameworks';
+	xobjs.PBXBuildFile[httpClientFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Frameworks';
 
 	frameworksBuildPhase.files.push({
-		value: apsFrameworkBuildFileUuid,
-		comment: xobjs.PBXBuildFile[apsFrameworkBuildFileUuid + '_comment']
+		value: httpClientFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[httpClientFrameworkBuildFileUuid + '_comment']
 	});
 
-	xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid] = {
+	xobjs.PBXBuildFile[httpClientEmbedFrameworkBuildFileUuid] = {
 		isa: 'PBXBuildFile',
-		fileRef: apsFrameworkFileRefUuid,
+		fileRef: httpClientFrameworkFileRefUuid,
 		fileRef_comment: 'APSHTTPClient.xcframework',
 		settings: { ATTRIBUTES: [ 'CodeSignOnCopy', ] }
 	};
-	xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Embed Frameworks';
+	xobjs.PBXBuildFile[httpClientEmbedFrameworkBuildFileUuid + '_comment'] = 'APSHTTPClient.xcframework in Embed Frameworks';
 
 	copyFilesBuildPhase.files.push({
-		value: apsEmbedFrameworkBuildFileUuid,
-		comment: xobjs.PBXBuildFile[apsEmbedFrameworkBuildFileUuid + '_comment']
+		value: httpClientEmbedFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[httpClientEmbedFrameworkBuildFileUuid + '_comment']
 	});
 
 	frameworksGroup.children.push({
-		value: apsFrameworkFileRefUuid,
+		value: httpClientFrameworkFileRefUuid,
 		comment: 'APSHTTPClient.xcframework'
+	});
+
+	// add APSAnalytics.xcframework
+	const analyticsFrameworkFileRefUuid = this.generateXcodeUuid(xcodeProject);
+	const analyticsFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+	const analyticsEmbedFrameworkBuildFileUuid = this.generateXcodeUuid(xcodeProject);
+
+	xobjs.PBXFileReference[analyticsFrameworkFileRefUuid] = {
+		isa: 'PBXFileReference',
+		lastKnownFileType: 'wrapper.xcframework',
+		name: '"APSAnalytics.xcframework"',
+		path: '"Frameworks/APSAnalytics.xcframework"',
+		sourceTree: '"<group>"'
+	};
+	xobjs.PBXFileReference[analyticsFrameworkFileRefUuid + '_comment'] = 'APSAnalytics.xcframework';
+
+	xobjs.PBXBuildFile[analyticsFrameworkBuildFileUuid] = {
+		isa: 'PBXBuildFile',
+		fileRef: analyticsFrameworkFileRefUuid,
+		fileRef_comment: 'APSAnalytics.xcframework'
+	};
+	xobjs.PBXBuildFile[analyticsFrameworkBuildFileUuid + '_comment'] = 'APSAnalytics.xcframework in Frameworks';
+
+	frameworksBuildPhase.files.push({
+		value: analyticsFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[analyticsFrameworkBuildFileUuid + '_comment']
+	});
+
+	xobjs.PBXBuildFile[analyticsEmbedFrameworkBuildFileUuid] = {
+		isa: 'PBXBuildFile',
+		fileRef: analyticsFrameworkFileRefUuid,
+		fileRef_comment: 'APSAnalytics.xcframework',
+		settings: { ATTRIBUTES: [ 'CodeSignOnCopy', ] }
+	};
+	xobjs.PBXBuildFile[analyticsEmbedFrameworkBuildFileUuid + '_comment'] = 'APSAnalytics.xcframework in Embed Frameworks';
+
+	copyFilesBuildPhase.files.push({
+		value: analyticsEmbedFrameworkBuildFileUuid,
+		comment: xobjs.PBXBuildFile[analyticsEmbedFrameworkBuildFileUuid + '_comment']
+	});
+
+	frameworksGroup.children.push({
+		value: analyticsFrameworkFileRefUuid,
+		comment: 'APSAnalytics.xcframework'
 	});
 
 	// run the xcode project hook

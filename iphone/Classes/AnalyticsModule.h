@@ -4,10 +4,10 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
-#if !TARGET_OS_MACCATALYST
 
 @import JavaScriptCore;
 @import TitaniumKit.ObjcProxy;
+@import APSAnalytics;
 
 @protocol AnalyticsExports <JSExport>
 
@@ -37,4 +37,3 @@ JSExportAs(navEvent,
 + (BOOL)isEventFiltered:(NSString *)eventName;
 
 @end
-#endif

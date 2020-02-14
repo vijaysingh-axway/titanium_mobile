@@ -15,11 +15,7 @@ FOUNDATION_EXPORT const unsigned char TitaniumKitVersionString[];
 
 // TiBase.h needs to come first because of all the macro definitions
 #import <TitaniumKit/TiBase.h>
-
 #import <TitaniumKit/APIModule.h>
-#if !TARGET_OS_MACCATALYST
-#import <TitaniumKit/APSAnalytics.h>
-#endif
 #import <TitaniumKit/ImageLoader.h>
 #import <TitaniumKit/Mimetypes.h>
 #import <TitaniumKit/NSData+Additions.h>
