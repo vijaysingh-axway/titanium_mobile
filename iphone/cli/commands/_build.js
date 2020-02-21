@@ -1224,15 +1224,13 @@ iOSBuilder.prototype.configOptionTarget = function configOptionTarget(order) {
 	return {
 		abbr: 'T',
 		callback: function (value) {
-			if (value !== 'simulator' || value !== 'mac') {
+			if (value !== 'simulator' && value !== 'mac') {
 				_t.assertIssue(iosInfo.issues, 'IOS_NO_KEYCHAINS_FOUND');
 				_t.assertIssue(iosInfo.issues, 'IOS_NO_WWDR_CERT_FOUND');
 			}
 
 			// as soon as we know the target, toggle required options for validation
 			switch (value) {
-				case 'mac':
-				      break;
 				case 'device':
 					_t.assertIssue(iosInfo.issues, 'IOS_NO_VALID_DEV_CERTS_FOUND');
 					_t.assertIssue(iosInfo.issues, 'IOS_NO_VALID_DEVELOPMENT_PROVISIONING_PROFILES');
@@ -1670,7 +1668,7 @@ iOSBuilder.prototype.initTiappSettings = function initTiappSettings() {
 				return true;
 			});
 
-			if (cli.argv.target !== 'simulator' || cli.argv.target !== 'mac') {
+			if (cli.argv.target !== 'simulator' && cli.argv.target !== 'mac') {
 				// check that all target provisioning profile uuids are valid
 				if (!tiappTargets[targetName].ppUUIDs || !tiappTargets[targetName].ppUUIDs[cli.argv.target]) {
 					if (cli.argv['pp-uuid']) {
@@ -3202,9 +3200,8 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 		buildSettings.CODE_SIGN_IDENTITY = `"${this.certDeveloperName}"`;
 		buildSettings.CODE_SIGN_STYLE = 'Manual';
 	} else if (this.target === 'mac') {
-		//TO DO: Change this hardcoded
-		buildSettings.CODE_SIGN_IDENTITY = '"Apple Development"';
-		buildSettings.CODE_SIGN_STYLE = 'Automatic';
+		buildSettings['"CODE_SIGN_IDENTITY[sdk=macosx*]"'] = `"-"`;
+		buildSettings.CODE_SIGN_STYLE = 'Manual';
 	}
 
 	// inject the team id and app groups
@@ -3230,21 +3227,15 @@ iOSBuilder.prototype.createXcodeProject = function createXcodeProject(next) {
 		const buildSettings = xobjs.XCBuildConfiguration[buildConf.value].buildSettings;
 		buildSettings.IPHONEOS_DEPLOYMENT_TARGET = appc.version.format(this.minIosVer, 2);
 		delete buildSettings['"CODE_SIGN_IDENTITY[sdk=iphoneos*]"'];
-		delete buildSettings['"CODE_SIGN_IDENTITY[sdk=macosx*]"'];
 	}, this);
 
 	// set the target-specific build settings
 	xobjs.XCConfigurationList[xobjs.PBXNativeTarget[mainTargetUuid].buildConfigurationList].buildConfigurations.forEach(function (buildConf) {
 		const bs = appc.util.mix(xobjs.XCBuildConfiguration[buildConf.value].buildSettings, buildSettings);
 		delete bs['"CODE_SIGN_IDENTITY[sdk=iphoneos*]"'];
-		delete bs['"CODE_SIGN_IDENTITY[sdk=macosx*]"'];
 
 		bs.PRODUCT_BUNDLE_IDENTIFIER = '"' + this.tiapp.id + '"';
 
-		if (this.target === 'mac') {
-			//TO DO: Change it
-		    bs.DEVELOPMENT_TEAM = this.tiapp.ios['team-id'];
-		}
 
 		if (this.enableMacTarget === false) {
 			bs.SUPPORTS_MACCATALYST = false;
@@ -4095,6 +4086,10 @@ iOSBuilder.prototype.writeEntitlementsPlist = function writeEntitlementsPlist(ne
 		if (!plist['keychain-access-groups'].some(id => id === plist['application-identifier'])) {
 			plist['keychain-access-groups'].push(plist['application-identifier']);
 		}
+	}
+	if (this.target === 'mac') {
+		// To run locally, disable library validation
+		plist['com.apple.security.cs.disable-library-validation'] = true;
 	}
 
 	this._embedCapabilitiesAndWriteEntitlementsPlist(plist, path.join(this.buildDir, this.tiapp.name + '.entitlements'), false, next);
