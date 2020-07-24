@@ -100,11 +100,9 @@ public class AndroidModule extends KrollModule implements Handler.Callback
 	 * @return			<code>true</code> if the manual location providers are being
 	 * 					used, <code>false</code> if not
 	 */
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getManualMode()
-	// clang-format on
 	{
 		return manualMode;
 	}
@@ -116,12 +114,10 @@ public class AndroidModule extends KrollModule implements Handler.Callback
 	 * @param manualMode			<code>boolean</code> value to indicate whether
 	 * 								the manual providers should be used
 	 */
-	// clang-format off
 	@SuppressWarnings("deprecation")
 	@Kroll.method
 	@Kroll.setProperty
 	public void setManualMode(boolean manualMode)
-	// clang-format on
 	{
 		if (this.manualMode != manualMode) {
 			this.manualMode = manualMode;
@@ -129,12 +125,7 @@ public class AndroidModule extends KrollModule implements Handler.Callback
 				geolocationModule.enableLocationProviders(manualLocationProviders);
 
 			} else {
-				if (geolocationModule.legacyModeActive) {
-					geolocationModule.enableLocationProviders(geolocationModule.legacyLocationProviders);
-
-				} else {
-					geolocationModule.enableLocationProviders(geolocationModule.simpleLocationProviders);
-				}
+				geolocationModule.enableLocationProviders(geolocationModule.simpleLocationProviders);
 			}
 		}
 	}
@@ -148,7 +139,7 @@ public class AndroidModule extends KrollModule implements Handler.Callback
 	 * @return					new instance of a location provider
 	 */
 	@Kroll.method
-	public LocationProviderProxy createLocationProvider(Object creationArgs[])
+	public LocationProviderProxy createLocationProvider(Object[] creationArgs)
 	{
 		String name = null;
 
@@ -178,7 +169,7 @@ public class AndroidModule extends KrollModule implements Handler.Callback
 	 * @return					new instance of a location rule
 	 */
 	@Kroll.method
-	public LocationRuleProxy createLocationRule(Object creationArgs[])
+	public LocationRuleProxy createLocationRule(Object[] creationArgs)
 	{
 		return new LocationRuleProxy(creationArgs);
 	}

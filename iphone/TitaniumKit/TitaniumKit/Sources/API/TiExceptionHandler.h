@@ -6,6 +6,11 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <JavaScriptCore/JSValueRef.h>
+
+@class KrollContext;
+@class JSValue;
+@class JSContext;
 
 #pragma mark - TiScriptError
 
@@ -43,6 +48,11 @@
  * Returns the call stack as a static string. May or may not include the most recent function.
  */
 @property (nonatomic, readonly) NSString *backtrace;
+
+/**
+ * Returns the native stack as a static string.
+ */
+@property (nonatomic, readonly) NSArray<NSString *> *nativeStack;
 
 - (id)initWithMessage:(NSString *)message sourceURL:(NSString *)sourceURL lineNo:(NSInteger)lineNo;
 - (id)initWithDictionary:(NSDictionary *)dictionary;
@@ -101,5 +111,9 @@
 + (TiExceptionHandler *)defaultExceptionHandler;
 
 - (void)reportScriptError:(TiScriptError *)error;
+
+- (void)reportScriptError:(JSValueRef)errorRef inKrollContext:(KrollContext *)krollContext;
+
+- (void)reportScriptError:(JSValue *)error inJSContext:(JSContext *)context;
 
 @end

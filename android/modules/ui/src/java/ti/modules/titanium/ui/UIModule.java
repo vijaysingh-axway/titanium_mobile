@@ -1,13 +1,15 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2016 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2020 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 package ti.modules.titanium.ui;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollProxy;
+import org.appcelerator.kroll.KrollRuntime;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
@@ -16,27 +18,28 @@ import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.TiDimension;
 import org.appcelerator.titanium.TiRootActivity;
 import org.appcelerator.titanium.proxy.TiWindowProxy;
+import org.appcelerator.titanium.util.TiAnimationCurve;
 import org.appcelerator.titanium.util.TiColorHelper;
 import org.appcelerator.titanium.util.TiDeviceOrientation;
 import org.appcelerator.titanium.util.TiUIHelper;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Message;
 import android.text.InputType;
 import android.text.util.Linkify;
 import android.view.View;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-// clang-format off
 @Kroll.module
-@Kroll.dynamicApis(properties = { "currentWindow" })
-public class UIModule extends KrollModule implements Handler.Callback
-// clang-format on
+public class UIModule extends KrollModule
 {
 	private static final String TAG = "TiUIModule";
 
@@ -69,27 +72,6 @@ public class UIModule extends KrollModule implements Handler.Callback
 
 	@Kroll.constant
 	public static final int KEYBOARD_APPEARANCE_DEFAULT = -1; // Not supported
-	@Kroll.constant
-	public static final int KEYBOARD_APPEARANCE_ALERT = -1; // Not supported
-
-	@Kroll.constant
-	public static final int KEYBOARD_ASCII = 0;
-	@Kroll.constant
-	public static final int KEYBOARD_NUMBERS_PUNCTUATION = 1;
-	@Kroll.constant
-	public static final int KEYBOARD_URL = 2;
-	@Kroll.constant
-	public static final int KEYBOARD_NUMBER_PAD = 3;
-	@Kroll.constant
-	public static final int KEYBOARD_PHONE_PAD = 4;
-	@Kroll.constant
-	public static final int KEYBOARD_EMAIL = 5;
-	@Kroll.constant
-	public static final int KEYBOARD_NAMEPHONE_PAD = 6;
-	@Kroll.constant
-	public static final int KEYBOARD_DEFAULT = 7;
-	@Kroll.constant
-	public static final int KEYBOARD_DECIMAL_PAD = 8;
 
 	@Kroll.constant
 	public static final int KEYBOARD_TYPE_ASCII = 0;
@@ -109,6 +91,15 @@ public class UIModule extends KrollModule implements Handler.Callback
 	public static final int KEYBOARD_TYPE_DEFAULT = 7;
 	@Kroll.constant
 	public static final int KEYBOARD_TYPE_DECIMAL_PAD = 8;
+
+	@Kroll.constant
+	public static final int ANIMATION_CURVE_EASE_IN = TiAnimationCurve.EASE_IN.toTiIntId();
+	@Kroll.constant
+	public static final int ANIMATION_CURVE_EASE_IN_OUT = TiAnimationCurve.EASE_IN_OUT.toTiIntId();
+	@Kroll.constant
+	public static final int ANIMATION_CURVE_EASE_OUT = TiAnimationCurve.EASE_OUT.toTiIntId();
+	@Kroll.constant
+	public static final int ANIMATION_CURVE_LINEAR = TiAnimationCurve.LINEAR.toTiIntId();
 
 	@Kroll.constant
 	public static final int AUTOLINK_ALL = Linkify.ALL;
@@ -393,28 +384,43 @@ public class UIModule extends KrollModule implements Handler.Callback
 	@Kroll.constant
 	public static final int HIDDEN_BEHAVIOR_INVISIBLE = View.INVISIBLE;
 
-	protected static final int MSG_SET_BACKGROUND_COLOR = KrollProxy.MSG_LAST_ID + 100;
-	protected static final int MSG_SET_BACKGROUND_IMAGE = KrollProxy.MSG_LAST_ID + 101;
-	protected static final int MSG_LAST_ID = MSG_SET_BACKGROUND_IMAGE;
+	@Kroll.constant
+	public static final int USER_INTERFACE_STYLE_LIGHT = Configuration.UI_MODE_NIGHT_NO;
+	@Kroll.constant
+	public static final int USER_INTERFACE_STYLE_DARK = Configuration.UI_MODE_NIGHT_YES;
+	@Kroll.constant
+	public static final int USER_INTERFACE_STYLE_UNSPECIFIED = Configuration.UI_MODE_NIGHT_UNDEFINED;
+
+	protected static final int MSG_LAST_ID = KrollProxy.MSG_LAST_ID + 101;
 
 	public UIModule()
 	{
 		super();
+
+		// Register the module's broadcast receiver.
+		final UIModule.Receiver broadcastReceiver = new UIModule.Receiver(this);
+		TiApplication.getInstance().registerReceiver(broadcastReceiver,
+													 new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
+
+		// Set up a listener to be invoked when the JavaScript runtime is about to be terminated/disposed.
+		KrollRuntime.addOnDisposingListener(new KrollRuntime.OnDisposingListener() {
+			@Override
+			public void onDisposing(KrollRuntime runtime)
+			{
+				// Remove this listener from the runtime's static collection.
+				KrollRuntime.removeOnDisposingListener(this);
+
+				// Unregister this module's broadcast receviers.
+				TiApplication.getInstance().unregisterReceiver(broadcastReceiver);
+			}
+		});
 	}
 
-	// clang-format off
 	@Kroll.setProperty(runOnUiThread = true)
 	@Kroll.method(runOnUiThread = true)
 	public void setBackgroundColor(String color)
-	// clang-format off
 	{
-		if (TiApplication.isUIThread()) {
-			doSetBackgroundColor(color);
-
-		} else {
-			Message message = getMainHandler().obtainMessage(MSG_SET_BACKGROUND_COLOR, color);
-			message.sendToTarget();
-		}
+		doSetBackgroundColor(color);
 	}
 
 	protected void doSetBackgroundColor(String color)
@@ -425,19 +431,11 @@ public class UIModule extends KrollModule implements Handler.Callback
 		}
 	}
 
-	// clang-format off
 	@Kroll.setProperty(runOnUiThread = true)
 	@Kroll.method(runOnUiThread = true)
 	public void setBackgroundImage(Object image)
-	// clang-format on
 	{
-		if (TiApplication.isUIThread()) {
-			doSetBackgroundImage(image);
-
-		} else {
-			Message message = getMainHandler().obtainMessage(MSG_SET_BACKGROUND_IMAGE, image);
-			message.sendToTarget();
-		}
+		doSetBackgroundImage(image);
 	}
 
 	protected void doSetBackgroundImage(Object image)
@@ -450,9 +448,10 @@ public class UIModule extends KrollModule implements Handler.Callback
 				try {
 					imageDrawable = TiUIHelper.getResourceDrawable((Integer) image);
 				} catch (Resources.NotFoundException e) {
-					Log.w(
-						TAG,
-						"Unable to set background drawable for root window.  An integer id was provided but no such drawable resource exists.");
+					String warningMessage
+						= "Unable to set background drawable for root window. "
+						+ "An integer id was provided but no such drawable resource exists.";
+					Log.w(TAG, warningMessage);
 				}
 			} else {
 				imageDrawable = TiUIHelper.getResourceDrawable(image);
@@ -516,27 +515,53 @@ public class UIModule extends KrollModule implements Handler.Callback
 		}
 	}
 
-	public boolean handleMessage(Message message)
+	@Kroll.getProperty
+	public int getUserInterfaceStyle()
 	{
-		switch (message.what) {
-			case MSG_SET_BACKGROUND_COLOR: {
-				doSetBackgroundColor((String) message.obj);
-
-				return true;
-			}
-			case MSG_SET_BACKGROUND_IMAGE: {
-				doSetBackgroundImage(message.obj);
-
-				return true;
-			}
-		}
-
-		return super.handleMessage(message);
+		return TiApplication.getInstance().getApplicationContext().getResources().getConfiguration().uiMode
+			& Configuration.UI_MODE_NIGHT_MASK;
 	}
 
 	@Override
 	public String getApiName()
 	{
 		return "Ti.UI";
+	}
+
+	private class Receiver extends BroadcastReceiver
+	{
+		private UIModule module;
+		private int lastEmittedStyle;
+
+		public Receiver(UIModule module)
+		{
+			super();
+			this.module = module;
+			lastEmittedStyle = this.module.getUserInterfaceStyle();
+		}
+
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			int currentMode = this.module.getUserInterfaceStyle();
+			if (currentMode == lastEmittedStyle) {
+				return;
+			}
+			lastEmittedStyle = currentMode;
+
+			KrollDict event = new KrollDict();
+			event.put(TiC.PROPERTY_VALUE, lastEmittedStyle);
+			this.module.fireEvent(TiC.EVENT_USER_INTERFACE_STYLE, event);
+		}
+	}
+
+	/**
+	 * Manually define `createShortcut` to allow `ShortcutModule` to exist for 'click' events.
+	 * @return Shortcut proxy instance.
+	 */
+	@Kroll.method
+	public KrollProxy createShortcut()
+	{
+		return new ShortcutProxy();
 	}
 }

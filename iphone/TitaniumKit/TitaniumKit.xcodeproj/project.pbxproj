@@ -25,11 +25,13 @@
 		4A175277218B64E70094C7B6 /* KrollTimerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A175275218B64E70094C7B6 /* KrollTimerManager.m */; };
 		4AF8DEEB1F0C27D6006270E1 /* libAPSAnalytics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBA197501F0C20E300B12D31 /* libAPSAnalytics.a */; };
 		4AF8DEEC1F0C27D9006270E1 /* libAPSHTTPClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBA197511F0C20E300B12D31 /* libAPSHTTPClient.a */; };
+		B106A6FD24535CB800B1305E /* JSValue+Addons.h in Headers */ = {isa = PBXBuildFile; fileRef = B106A6FB24535CB800B1305E /* JSValue+Addons.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B106A6FE24535CB800B1305E /* JSValue+Addons.m in Sources */ = {isa = PBXBuildFile; fileRef = B106A6FC24535CB800B1305E /* JSValue+Addons.m */; };
+		B7624B6C216663C7000C365A /* ObjcProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = B7624B6A216663C7000C365A /* ObjcProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B7624B6D216663C7000C365A /* ObjcProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B7624B6B216663C7000C365A /* ObjcProxy.m */; };
 		DB1596592075389000292B19 /* APIModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB1596572075389000292B19 /* APIModule.m */; };
 		DB15965A2075389000292B19 /* APIModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DB1596582075389000292B19 /* APIModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB15965E2075458A00292B19 /* XHRBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15965C2075458A00292B19 /* XHRBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB15965F2075458A00292B19 /* XHRBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15965D2075458A00292B19 /* XHRBridge.m */; };
-		DB1596622075461400292B19 /* SBJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = DB1596602075461400292B19 /* SBJSON.h */; };
+		DB1596622075461400292B19 /* SBJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = DB1596602075461400292B19 /* SBJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB1596632075461400292B19 /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = DB1596612075461400292B19 /* SBJSON.m */; };
 		DB15FBEE1F0A80E400A82C45 /* TiDimension.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15FBEA1F0A80E400A82C45 /* TiDimension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB15FBEF1F0A80E400A82C45 /* TiDimension.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15FBEB1F0A80E400A82C45 /* TiDimension.m */; };
@@ -103,8 +105,6 @@
 		DB15FCB11F0A86E600A82C45 /* TiBindingTiValue.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15FCAF1F0A86E600A82C45 /* TiBindingTiValue.m */; };
 		DB15FCB81F0A874F00A82C45 /* TopTiModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15FCB61F0A874F00A82C45 /* TopTiModule.h */; };
 		DB15FCB91F0A874F00A82C45 /* TopTiModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15FCB71F0A874F00A82C45 /* TopTiModule.m */; };
-		DB15FCC01F0A876F00A82C45 /* TiConsole.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15FCBE1F0A876F00A82C45 /* TiConsole.h */; };
-		DB15FCC11F0A876F00A82C45 /* TiConsole.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15FCBF1F0A876F00A82C45 /* TiConsole.m */; };
 		DB15FCC81F0A879B00A82C45 /* ImageLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15FCC61F0A879B00A82C45 /* ImageLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB15FCC91F0A879B00A82C45 /* ImageLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = DB15FCC71F0A879B00A82C45 /* ImageLoader.m */; };
 		DB15FCCC1F0A87A400A82C45 /* TiErrorController.h in Headers */ = {isa = PBXBuildFile; fileRef = DB15FCCA1F0A87A400A82C45 /* TiErrorController.h */; };
@@ -181,10 +181,12 @@
 /* Begin PBXFileReference section */
 		4A175274218B64E70094C7B6 /* KrollTimerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KrollTimerManager.h; sourceTree = "<group>"; };
 		4A175275218B64E70094C7B6 /* KrollTimerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KrollTimerManager.m; sourceTree = "<group>"; };
+		B106A6FB24535CB800B1305E /* JSValue+Addons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JSValue+Addons.h"; sourceTree = "<group>"; };
+		B106A6FC24535CB800B1305E /* JSValue+Addons.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JSValue+Addons.m"; sourceTree = "<group>"; };
+		B7624B6A216663C7000C365A /* ObjcProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjcProxy.h; sourceTree = "<group>"; };
+		B7624B6B216663C7000C365A /* ObjcProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjcProxy.m; sourceTree = "<group>"; };
 		DB1596572075389000292B19 /* APIModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APIModule.m; sourceTree = "<group>"; };
 		DB1596582075389000292B19 /* APIModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APIModule.h; sourceTree = "<group>"; };
-		DB15965C2075458A00292B19 /* XHRBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XHRBridge.h; sourceTree = "<group>"; };
-		DB15965D2075458A00292B19 /* XHRBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XHRBridge.m; sourceTree = "<group>"; };
 		DB1596602075461400292B19 /* SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJSON.h; sourceTree = "<group>"; };
 		DB1596612075461400292B19 /* SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJSON.m; sourceTree = "<group>"; };
 		DB15FBEA1F0A80E400A82C45 /* TiDimension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiDimension.h; sourceTree = "<group>"; };
@@ -259,8 +261,6 @@
 		DB15FCAF1F0A86E600A82C45 /* TiBindingTiValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TiBindingTiValue.m; sourceTree = "<group>"; };
 		DB15FCB61F0A874F00A82C45 /* TopTiModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TopTiModule.h; sourceTree = "<group>"; };
 		DB15FCB71F0A874F00A82C45 /* TopTiModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TopTiModule.m; sourceTree = "<group>"; };
-		DB15FCBE1F0A876F00A82C45 /* TiConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiConsole.h; sourceTree = "<group>"; };
-		DB15FCBF1F0A876F00A82C45 /* TiConsole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TiConsole.m; sourceTree = "<group>"; };
 		DB15FCC61F0A879B00A82C45 /* ImageLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageLoader.h; sourceTree = "<group>"; };
 		DB15FCC71F0A879B00A82C45 /* ImageLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageLoader.m; sourceTree = "<group>"; };
 		DB15FCCA1F0A87A400A82C45 /* TiErrorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiErrorController.h; sourceTree = "<group>"; };
@@ -445,6 +445,8 @@
 		DB258D181F097680000D0D8D /* API */ = {
 			isa = PBXGroup;
 			children = (
+				B7624B6A216663C7000C365A /* ObjcProxy.h */,
+				B7624B6B216663C7000C365A /* ObjcProxy.m */,
 				DB1596582075389000292B19 /* APIModule.h */,
 				DB1596572075389000292B19 /* APIModule.m */,
 				DB258D191F097680000D0D8D /* Bridge.h */,
@@ -487,8 +489,6 @@
 				DB15FC441F0A838E00A82C45 /* TiColor.m */,
 				DB15FD1E1F0A8A5E00A82C45 /* TiComplexValue.h */,
 				DB15FD1F1F0A8A5E00A82C45 /* TiComplexValue.m */,
-				DB15FCBE1F0A876F00A82C45 /* TiConsole.h */,
-				DB15FCBF1F0A876F00A82C45 /* TiConsole.m */,
 				DB15FC831F0A857E00A82C45 /* TiControllerProtocols.h */,
 				DB15FBEA1F0A80E400A82C45 /* TiDimension.h */,
 				DB15FBEB1F0A80E400A82C45 /* TiDimension.m */,
@@ -552,8 +552,8 @@
 				DB15FC5E1F0A84C900A82C45 /* Webcolor.m */,
 				DB15FC471F0A83A700A82C45 /* WebFont.h */,
 				DB15FC481F0A83A700A82C45 /* WebFont.m */,
-				DB15965C2075458A00292B19 /* XHRBridge.h */,
-				DB15965D2075458A00292B19 /* XHRBridge.m */,
+				B106A6FB24535CB800B1305E /* JSValue+Addons.h */,
+				B106A6FC24535CB800B1305E /* JSValue+Addons.m */,
 			);
 			name = API;
 			path = Sources/API;
@@ -619,6 +619,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB1596622075461400292B19 /* SBJSON.h in Headers */,
 				DB3908652075228900AE31EC /* APSAnalytics.h in Headers */,
 				DB15FCAC1F0A86D400A82C45 /* TiLogServer.h in Headers */,
 				DBE66A36210F92FD00095F1E /* KrollWrapper.h in Headers */,
@@ -628,12 +629,12 @@
 				DB15FC731F0A850E00A82C45 /* Mimetypes.h in Headers */,
 				DB258D611F097680000D0D8D /* Bridge.h in Headers */,
 				DB258D631F097680000D0D8D /* KrollBridge.h in Headers */,
+				B7624B6C216663C7000C365A /* ObjcProxy.h in Headers */,
 				DB15FC501F0A848B00A82C45 /* TiEvaluator.h in Headers */,
 				DB15FD0F1F0A895400A82C45 /* TiTab.h in Headers */,
 				DB15FC981F0A862000A82C45 /* TiPoint.h in Headers */,
 				DB15FC3F1F0A833100A82C45 /* KrollPropertyDelegate.h in Headers */,
 				DB15FC671F0A84E000A82C45 /* TiStylesheet.h in Headers */,
-				DB1596622075461400292B19 /* SBJSON.h in Headers */,
 				DB15FBF01F0A80E400A82C45 /* TiThreading.h in Headers */,
 				DB258D9B1F097680000D0D8D /* TiToolbar.h in Headers */,
 				DB15FCB01F0A86E600A82C45 /* TiBindingTiValue.h in Headers */,
@@ -674,7 +675,6 @@
 				DB15FD241F0A8A7B00A82C45 /* TiBindingEvent.h in Headers */,
 				DB15FD141F0A897B00A82C45 /* TiViewController.h in Headers */,
 				DB15FC451F0A838E00A82C45 /* TiColor.h in Headers */,
-				DB15FCC01F0A876F00A82C45 /* TiConsole.h in Headers */,
 				DB3908662075228900AE31EC /* APSHTTPResponse.h in Headers */,
 				DB3908692075228900AE31EC /* APSHTTPHelper.h in Headers */,
 				DB3908672075228900AE31EC /* APSHTTPRequest.h in Headers */,
@@ -684,13 +684,13 @@
 				DB15FC7F1F0A855F00A82C45 /* UIImage+Alpha.h in Headers */,
 				DB15965A2075389000292B19 /* APIModule.h in Headers */,
 				DB15FD201F0A8A5E00A82C45 /* TiComplexValue.h in Headers */,
-				DB15965E2075458A00292B19 /* XHRBridge.h in Headers */,
 				DB5813E72075FCF200CA1437 /* TiDefines.h in Headers */,
 				DB24E0502076824C0033B2B1 /* TiSharedConfig.h in Headers */,
 				DB15FC3D1F0A833100A82C45 /* KrollObject.h in Headers */,
 				DB15FCA81F0A866300A82C45 /* TiRect.h in Headers */,
 				DB15FC891F0A859800A82C45 /* TiExceptionHandler.h in Headers */,
 				DB15FD281F0A93A900A82C45 /* TiFilesystemFileStreamProxy.h in Headers */,
+				B106A6FD24535CB800B1305E /* JSValue+Addons.h in Headers */,
 				DB15FCB81F0A874F00A82C45 /* TopTiModule.h in Headers */,
 				DB15FC3B1F0A833100A82C45 /* KrollMethodDelegate.h in Headers */,
 				DB15FC391F0A833100A82C45 /* KrollMethod.h in Headers */,
@@ -731,7 +731,7 @@
 		DB258CC41F09757E000D0D8D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Hans Knoechel";
 				TargetAttributes = {
 					DB258CCC1F09757E000D0D8D = {
@@ -746,10 +746,11 @@
 			};
 			buildConfigurationList = DB258CC71F09757E000D0D8D /* Build configuration list for PBXProject "TitaniumKit" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = DB258CC31F09757E000D0D8D;
 			productRefGroup = DB258CCE1F09757E000D0D8D /* Products */;
@@ -799,10 +800,10 @@
 				DB15FCB11F0A86E600A82C45 /* TiBindingTiValue.m in Sources */,
 				DB15FC461F0A838E00A82C45 /* TiColor.m in Sources */,
 				DB15FBF51F0A80FA00A82C45 /* TiPublicAPI.m in Sources */,
+				B7624B6D216663C7000C365A /* ObjcProxy.m in Sources */,
 				DB15FC8C1F0A859800A82C45 /* UIImage+RoundedCorner.m in Sources */,
 				DB15FC741F0A850E00A82C45 /* Mimetypes.m in Sources */,
 				DB15FC801F0A855F00A82C45 /* UIImage+Alpha.m in Sources */,
-				DB15FCC11F0A876F00A82C45 /* TiConsole.m in Sources */,
 				DB15FCA51F0A864A00A82C45 /* TiGradient.m in Sources */,
 				DB15FD311F0A948B00A82C45 /* TiUIiOSTransitionAnimationProxy.m in Sources */,
 				DB15FD351F0A95C500A82C45 /* TiUIViewProxy.m in Sources */,
@@ -817,6 +818,7 @@
 				DB15FC701F0A84FD00A82C45 /* TiBlob.m in Sources */,
 				DB15FD0D1F0A894000A82C45 /* TiWindowProxy.m in Sources */,
 				DB15FC991F0A862000A82C45 /* TiPoint.m in Sources */,
+				B106A6FE24535CB800B1305E /* JSValue+Addons.m in Sources */,
 				DB1596632075461400292B19 /* SBJSON.m in Sources */,
 				DB15FCA11F0A863B00A82C45 /* LayoutConstraint.m in Sources */,
 				DB15FC9D1F0A862D00A82C45 /* ListenerEntry.m in Sources */,
@@ -857,7 +859,6 @@
 				DB15FD211F0A8A5E00A82C45 /* TiComplexValue.m in Sources */,
 				DB258D8D1F097680000D0D8D /* TiProxy.m in Sources */,
 				DB15FC541F0A849D00A82C45 /* TiBindingRunLoop.m in Sources */,
-				DB15965F2075458A00292B19 /* XHRBridge.m in Sources */,
 				DB15FCFC1F0A88B100A82C45 /* TiLocale.m in Sources */,
 				DB15FCF81F0A889100A82C45 /* TiLayoutQueue.m in Sources */,
 				DB15FBF11F0A80E400A82C45 /* TiThreading.m in Sources */,
@@ -878,15 +879,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -902,6 +911,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"DEBUG_RESOURCE_PATHS=1",
 					"$(inherited)",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -910,7 +920,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -930,15 +940,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -956,7 +974,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -971,6 +989,7 @@
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = NO;
 				CODE_SIGN_IDENTITY = "";
@@ -983,7 +1002,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = TitaniumKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1011,6 +1030,7 @@
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = NO;
 				CODE_SIGN_IDENTITY = "";
@@ -1022,7 +1042,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = TitaniumKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

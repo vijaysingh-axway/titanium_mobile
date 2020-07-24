@@ -21,6 +21,7 @@
   BOOL focussed;
   BOOL isModal;
   BOOL hidesStatusBar;
+  BOOL forceModal;
   UIStatusBarStyle barStyle;
   TiViewProxy<TiTab> *tab;
   TiAnimation *openAnimation;
@@ -33,6 +34,7 @@
 @property (nonatomic, readonly) TiProxy *tabGroup;
 @property (nonatomic) BOOL isMasterWindow;
 @property (nonatomic) BOOL isDetailWindow;
+@property (nonatomic) BOOL safeAreaInsetsUpdated;
 
 - (void)processForSafeArea;
 - (UIViewController *)windowHoldingController;

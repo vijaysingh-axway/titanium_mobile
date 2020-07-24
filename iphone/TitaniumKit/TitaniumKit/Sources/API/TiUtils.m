@@ -31,7 +31,6 @@
 static NSDictionary *encodingMap = nil;
 static NSDictionary *typeMap = nil;
 static NSDictionary *sizeMap = nil;
-static NSString *kAppUUIDString = @"com.appcelerator.uuid"; // don't obfuscate
 
 @implementation TiUtils
 
@@ -586,12 +585,23 @@ static NSString *kAppUUIDString = @"com.appcelerator.uuid"; // don't obfuscate
 
 + (NSString *)hexColorValue:(UIColor *)color
 {
-  const CGFloat *components = CGColorGetComponents(color.CGColor);
-
-  return [NSString stringWithFormat:@"#%02lX%02lX%02lX",
-                   lroundf(components[0] * 255),
-                   lroundf(components[1] * 255),
-                   lroundf(components[2] * 255)];
+  CGFloat red;
+  CGFloat green;
+  CGFloat blue;
+  CGFloat alpha;
+  BOOL wasConverted = [color getRed:&red
+                              green:&green
+                               blue:&blue
+                              alpha:&alpha];
+  if (!wasConverted) {
+    return @"#000000";
+  }
+  if (lroundf(alpha * 255.0) != 255) {
+    // AARRGGBB
+    return [NSString stringWithFormat:@"#%02lX%02lX%02lX%02lX", lroundf(alpha * 255.0), lroundf(red * 255.0), lroundf(green * 255.0), lroundf(blue * 255.0)];
+  }
+  // RRGGBB
+  return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(red * 255.0), lroundf(green * 255.0), lroundf(blue * 255.0)];
 }
 
 + (TiDimension)dimensionValue:(id)value
@@ -758,6 +768,25 @@ static NSString *kAppUUIDString = @"com.appcelerator.uuid"; // don't obfuscate
   UIGraphicsEndImageContext();
 
   return imageCopy;
+}
+
++ (UIImage *)imageWithTint:(UIImage *)image tintColor:(UIColor *)tintColor
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+  if ([TiUtils isIOSVersionOrGreater:@"13.0"]) {
+    return [image imageWithTintColor:tintColor renderingMode:UIImageRenderingModeAlwaysOriginal];
+  }
+#endif
+  UIImage *imageNew = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  UIImageView *imageView = [[UIImageView alloc] initWithImage:imageNew];
+  imageView.tintColor = tintColor;
+
+  UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, NO, 0.0);
+  [imageView.layer renderInContext:UIGraphicsGetCurrentContext()];
+  UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+
+  return tintedImage;
 }
 
 + (NSURL *)checkFor2XImage:(NSURL *)url
@@ -1203,10 +1232,14 @@ If the new path starts with / and the base url is app://..., we have to massage 
 
 + (NSDictionary *)touchPropertiesToDictionary:(UITouch *)touch andView:(UIView *)view
 {
+  CGPoint point = [touch locationInView:view];
+  point.x = convertDipToDefaultUnit(point.x);
+  point.y = convertDipToDefaultUnit(point.y);
+
   if ([self forceTouchSupported] || [self validatePencilWithTouch:touch]) {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                         [NSNumber numberWithDouble:[touch locationInView:view].x], @"x",
-                                                     [NSNumber numberWithDouble:[touch locationInView:view].y], @"y",
+                                                         [NSNumber numberWithFloat:point.x], @"x",
+                                                     [NSNumber numberWithFloat:point.y], @"y",
                                                      [NSNumber numberWithFloat:touch.force], @"force",
                                                      [NSNumber numberWithFloat:touch.maximumPossibleForce], @"maximumPossibleForce",
                                                      [NSNumber numberWithDouble:touch.timestamp], @"timestamp",
@@ -1224,7 +1257,7 @@ If the new path starts with / and the base url is app://..., we have to massage 
     return dict;
   }
 
-  return [self pointToDictionary:[touch locationInView:view]];
+  return [self pointToDictionary:point];
 }
 
 + (CGRect)contentFrame:(BOOL)window
@@ -1267,6 +1300,49 @@ If the new path starts with / and the base url is app://..., we have to massage 
 + (WebFont *)fontValue:(id)value
 {
   return [self fontValue:value def:[WebFont defaultFont]];
+}
+
++ (TiScriptError *)scriptErrorFromValueRef:(JSValueRef)valueRef inContext:(JSGlobalContextRef)contextRef
+{
+  JSContext *context = [JSContext contextWithJSGlobalContextRef:contextRef];
+  JSValue *error = [JSValue valueWithJSValueRef:valueRef inContext:context];
+  NSMutableDictionary *errorDict = [NSMutableDictionary new];
+
+  if ([error hasProperty:@"constructor"]) {
+    [errorDict setObject:[error[@"constructor"][@"name"] toString] forKey:@"type"];
+  }
+
+  // error message
+  if ([error hasProperty:@"message"]) {
+    [errorDict setObject:[error[@"message"] toString] forKey:@"message"];
+  }
+  if ([error hasProperty:@"nativeReason"]) {
+    [errorDict setObject:[error[@"nativeReason"] toString] forKey:@"nativeReason"];
+  }
+
+  // error location
+  if ([error hasProperty:@"sourceURL"]) {
+    [errorDict setObject:[error[@"sourceURL"] toString] forKey:@"sourceURL"];
+  }
+  if ([error hasProperty:@"line"]) {
+    [errorDict setObject:[error[@"line"] toNumber] forKey:@"line"];
+  }
+  if ([error hasProperty:@"column"]) {
+    [errorDict setObject:[error[@"column"] toNumber] forKey:@"column"];
+  }
+
+  // stack trace
+  if ([error hasProperty:@"backtrace"]) {
+    [errorDict setObject:[error[@"backtrace"] toString] forKey:@"backtrace"];
+  }
+  if ([error hasProperty:@"stack"]) {
+    [errorDict setObject:[error[@"stack"] toString] forKey:@"stack"];
+  }
+  if ([error hasProperty:@"nativeStack"]) {
+    [errorDict setObject:[error[@"nativeStack"] toString] forKey:@"nativeStack"];
+  }
+
+  return [[[TiScriptError alloc] initWithDictionary:errorDict] autorelease];
 }
 
 + (TiScriptError *)scriptErrorValue:(id)value;
@@ -1416,6 +1492,52 @@ If the new path starts with / and the base url is app://..., we have to massage 
   ApplyConstraintToViewWithBounds([proxy layoutProperties], view, bounds);
 }
 
++ (NSString *)composeAccessibilityIdentifier:(id)object
+{
+  NSString *accessibilityLabel = [object accessibilityLabel];
+  NSString *accessibilityValue = [object accessibilityValue];
+  NSString *accessibilityHint = [object accessibilityHint];
+
+  NSString *pattern = @"^.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\]^_`{|}~]\\s*$";
+  NSString *dot = @".";
+  NSString *space = @" ";
+  NSError *error = nil;
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:&error];
+  NSMutableArray *array = [NSMutableArray array];
+  NSUInteger numberOfMatches;
+
+  if (accessibilityLabel != nil && accessibilityLabel.length) {
+    [array addObject:accessibilityLabel];
+    numberOfMatches = [regex numberOfMatchesInString:accessibilityLabel options:0 range:NSMakeRange(0, [accessibilityLabel length])];
+    if (numberOfMatches == 0) {
+      [array addObject:dot];
+    }
+  }
+
+  if (accessibilityValue != nil && accessibilityValue.length) {
+    if ([array count] > 0) {
+      [array addObject:space];
+    }
+    [array addObject:accessibilityValue];
+    numberOfMatches = [regex numberOfMatchesInString:accessibilityValue options:0 range:NSMakeRange(0, [accessibilityValue length])];
+    if (numberOfMatches == 0) {
+      [array addObject:dot];
+    }
+  }
+
+  if (accessibilityHint != nil && accessibilityHint.length) {
+    if ([array count] > 0) {
+      [array addObject:space];
+    }
+    [array addObject:accessibilityHint];
+    numberOfMatches = [regex numberOfMatchesInString:accessibilityHint options:0 range:NSMakeRange(0, [accessibilityHint length])];
+    if (numberOfMatches == 0) {
+      [array addObject:dot];
+    }
+  }
+  return [array componentsJoinedByString:@""];
+}
+
 + (CGRect)viewPositionRect:(UIView *)view
 {
 #if USEFRAME
@@ -1486,7 +1608,9 @@ If the new path starts with / and the base url is app://..., we have to massage 
       if ([appurlstr characterAtIndex:0] == '/') {
         appurlstr = [appurlstr substringFromIndex:1];
       }
+#if DEBUG_RESOURCE_PATHS
       DebugLog(@"[DEBUG] Loading: %@, Resource: %@", urlstring, appurlstr);
+#endif
       return [AppRouter performSelector:@selector(resolveAppAsset:) withObject:appurlstr];
     }
   }
@@ -1845,24 +1969,24 @@ If the new path starts with / and the base url is app://..., we have to massage 
   return value;
 }
 
++ (NSString *)convertToHexFromData:(NSData *)data
+{
+  NSUInteger dataLength = data.length;
+  unsigned char *dataBytes = (unsigned char *)data.bytes;
+  NSMutableString *encoded = [[NSMutableString alloc] initWithCapacity:dataLength * 2];
+  for (int i = 0; i < dataLength; i++) {
+    [encoded appendFormat:@"%02x", dataBytes[i]];
+  }
+  NSString *value = [encoded lowercaseString];
+  [encoded release];
+  return value;
+}
+
 + (NSString *)md5:(NSData *)data
 {
   unsigned char result[CC_MD5_DIGEST_LENGTH];
   CC_MD5([data bytes], (CC_LONG)[data length], result);
   return [self convertToHex:(unsigned char *)&result length:CC_MD5_DIGEST_LENGTH];
-}
-
-+ (NSString *)appIdentifier
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *uid = [defaults stringForKey:kAppUUIDString];
-  if (uid == nil) {
-    uid = [TiUtils createUUID];
-    [defaults setObject:uid forKey:kAppUUIDString];
-    [defaults synchronize];
-  }
-
-  return uid;
 }
 
 // In pre-iOS 5, it looks like response headers were case-mangled.
@@ -2079,6 +2203,12 @@ If the new path starts with / and the base url is app://..., we have to massage 
 
 + (id)stripInvalidJSONPayload:(id)jsonPayload
 {
+  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+  dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+  dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+  // ISO08601 formatting, same as Javascript stringified new Date()
+  dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
   if ([jsonPayload isKindOfClass:[NSDictionary class]]) {
     NSMutableDictionary *result = [NSMutableDictionary new];
     for (NSString *key in [jsonPayload allKeys]) {
@@ -2087,6 +2217,9 @@ If the new path starts with / and the base url is app://..., we have to massage 
         value = [TiUtils stripInvalidJSONPayload:value];
       }
       if ([self isSupportedFragment:value]) {
+        if ([value isKindOfClass:[NSDate class]]) {
+          value = [dateFormatter stringFromDate:value];
+        }
         [result setObject:value forKey:key];
       } else {
         DebugLog(@"[WARN] Found invalid attribute \"%@\" that cannot be serialized, skipping it ...", key)
@@ -2100,6 +2233,9 @@ If the new path starts with / and the base url is app://..., we have to massage 
         value = [TiUtils stripInvalidJSONPayload:value];
       }
       if ([self isSupportedFragment:value]) {
+        if ([value isKindOfClass:[NSDate class]]) {
+          value = [dateFormatter stringFromDate:value];
+        }
         [result addObject:value];
       } else {
         DebugLog(@"[WARN] Found invalid value \"%@\" that cannot be serialized, skipping it ...", value);
@@ -2127,6 +2263,17 @@ If the new path starts with / and the base url is app://..., we have to massage 
   } @catch (NSException *e) {
     return NO;
   }
+}
+
++ (BOOL)isHyperloopAvailable
+{
+  static BOOL isHyperloopAvailable = NO;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    Class cls = NSClassFromString(@"Hyperloop");
+    isHyperloopAvailable = cls != nil;
+  });
+  return isHyperloopAvailable;
 }
 
 @end

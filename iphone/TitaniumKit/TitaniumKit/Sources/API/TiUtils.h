@@ -20,7 +20,7 @@
  *	The following 4 imports will be going away as it's better to simply
  *	forward-declare the classes in headers. If you've been relying on TiUtils
  *	to do the including of TiProxy for you, please fix this. However, to
- *	avoid breaking modules 
+ *	avoid breaking modules
  */
 #import "TiBuffer.h"
 #import "TiColor.h"
@@ -165,6 +165,15 @@ typedef enum {
 + (UIImage *)adjustRotation:(UIImage *)image;
 
 /**
+ Tint image to specified color.
+
+ @param image The image to be tinted.
+ @param tintColor The color to tint the image.
+ @return The tinted image.
+ */
++ (UIImage *)imageWithTint:(UIImage *)image tintColor:(UIColor *)tintColor;
+
+/**
  Constructs URL from string using provided base URL.
 
  @param relativeString The relative URL
@@ -184,7 +193,7 @@ typedef enum {
 
 /**
  Loads and returns image for the provided object.
- 
+
  If the _object_ parameter type is <TiBlob>, it will be converted to image and returned.
  Otherwise if the _object_ type is NSString, it will be first converted to URL using _proxy_ as a base, then the image will be loaded from the URL.
 
@@ -523,6 +532,8 @@ typedef enum {
 
 + (TiScriptError *)scriptErrorValue:(id)value;
 
++ (TiScriptError *)scriptErrorFromValueRef:(JSValueRef)valueRef inContext:(JSGlobalContextRef)contextRef;
+
 + (NSTextAlignment)textAlignmentValue:(id)alignment;
 
 + (NSString *)jsonStringify:(id)value;
@@ -576,6 +587,8 @@ typedef enum {
 + (void)setView:(UIView *)view positionRect:(CGRect)frameRect;
 
 + (void)applyConstraintToView:(TiUIView *)view forProxy:(TiViewProxy *)proxy withBounds:(CGRect)bounds;
+
++ (NSString *)composeAccessibilityIdentifier:(id)object;
 
 + (CGRect)viewPositionRect:(UIView *)view;
 
@@ -791,7 +804,7 @@ typedef enum {
  */
 + (NSString *)convertToHex:(unsigned char *)input length:(size_t)length;
 
-+ (NSString *)appIdentifier;
++ (NSString *)convertToHexFromData:(NSData *)data;
 
 + (NSString *)getResponseHeader:(NSString *)header fromHeaders:(NSDictionary *)responseHeaders;
 
@@ -845,5 +858,12 @@ typedef enum {
  @return _YES_ if launch-screen storyboard are used.
  */
 + (BOOL)isUsingLaunchScreenStoryboard;
+
+/**
+ Checks if Hyperloop is available in this app.
+
+ @return _YES_ if Hyperloop is available, _NO_ otherwise.
+ */
++ (BOOL)isHyperloopAvailable;
 
 @end

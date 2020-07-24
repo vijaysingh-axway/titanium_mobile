@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2010 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2018 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -23,12 +23,14 @@
 @synthesize delegate;
 @synthesize zIndex, left, right, top, bottom, width, height;
 @synthesize duration, color, backgroundColor, opacity, opaque, view;
-@synthesize visible, curve, repeat, autoreverse, delay, transform, transition;
+@synthesize visible, curve, repeat, autoreverse, delay, transform, transition, dampingRatio, springVelocity;
 @synthesize animatedView, callback, isReverse, reverseAnimation, resetState;
 
-- (id)initWithDictionary:(NSDictionary *)properties context:(id<TiEvaluator>)context_ callback:(KrollCallback *)callback_
+- (id)initWithDictionary:(NSDictionary *)properties_ context:(id<TiEvaluator>)context_ callback:(KrollCallback *)callback_
 {
   if (self = [super _initWithPageContext:context_]) {
+    // store the properties until animation is done
+    properties = [properties_ copy];
 #define SET_FLOAT_PROP(p, d)                                      \
   {                                                               \
     id v = d == nil ? nil : [d objectForKey:@ #p];                \
@@ -95,6 +97,8 @@
     SET_FLOAT_PROP(duration, properties);
     SET_FLOAT_PROP(opacity, properties);
     SET_FLOAT_PROP(delay, properties);
+    SET_FLOAT_PROP(dampingRatio, properties);
+    SET_FLOAT_PROP(springVelocity, properties);
     SET_INT_PROP(curve, properties);
     SET_INT_PROP(repeat, properties);
     SET_BOOL_PROP(visible, properties);
@@ -153,6 +157,9 @@
   RELEASE_TO_NIL(transition);
   RELEASE_TO_NIL(callback);
   RELEASE_TO_NIL(view);
+  RELEASE_TO_NIL(dampingRatio);
+  RELEASE_TO_NIL(springVelocity);
+  RELEASE_TO_NIL(properties);
   [animatedViewProxy release];
   [super dealloc];
 }
@@ -271,6 +278,15 @@
 
   if (animation.delegate != nil && [animation.delegate respondsToSelector:@selector(animationWillComplete:)]) {
     [animation.delegate animationWillComplete:self];
+  }
+
+  // Update the modified properties on the view!
+  if (animatedViewProxy != nil) {
+    if (!isReverse && ![autoreverse boolValue] && properties != nil) {
+      [animatedViewProxy applyProperties:properties];
+    }
+    // TODO: What about center?
+    RELEASE_TO_NIL(properties);
   }
 
   // fire the event and call the callback
@@ -397,7 +413,7 @@
     options |= ([autoreverse boolValue] ? (UIViewAnimationOptionAutoreverse | UIViewAnimationOptionRepeat) : 0);
     options |= (([repeat intValue] > 0) ? UIViewAnimationOptionRepeat : 0);
 
-    void (^animation)() = ^{
+    void (^animation)(void) = ^{
       CGFloat repeatCount = [repeat intValue];
       if ((options & UIViewAnimationOptionAutoreverse)) {
         // What we have to do here in order to get the 'correct' animation
@@ -414,7 +430,21 @@
         [reverseAnimation setIsReverse:YES];
         [reverseAnimation setDuration:duration];
         [reverseAnimation setDelay:[NSNumber numberWithInt:0]];
-        [reverseAnimation setCurve:curve];
+        if (dampingRatio != nil || springVelocity != nil) {
+          [reverseAnimation setDampingRatio:dampingRatio];
+          [reverseAnimation setSpringVelocity:springVelocity];
+        }
+        switch ([curve intValue]) {
+        case UIViewAnimationOptionCurveEaseIn:
+          [reverseAnimation setCurve:[NSNumber numberWithInt:UIViewAnimationOptionCurveEaseOut]];
+          break;
+        case UIViewAnimationOptionCurveEaseOut:
+          [reverseAnimation setCurve:[NSNumber numberWithInt:UIViewAnimationOptionCurveEaseIn]];
+          break;
+        default:
+          [reverseAnimation setCurve:curve];
+          break;
+        }
         repeatCount -= 0.5;
 
         // A repeat count of 0 means the animation cycles once.
@@ -447,6 +477,18 @@
             transformMatrix = [[[Ti2DMatrix alloc] init] autorelease];
           }
           [reverseAnimation setTransform:transformMatrix];
+        }
+        if ([transform isKindOfClass:[Ti2DMatrix class]]) {
+          // Special handling if matrix does an exact 180 or -180 degree rotation.
+          // Forward animation and final reverse animation will never rotate counter-clockwise in this case.
+          // Work-around is to slightly offset the rotation. (This won't affect rotation back to 0 degrees.)
+          const float ROTATION_EPSILON = 0.01f;
+          Ti2DMatrix *transformMatrix = (Ti2DMatrix *)transform;
+          float degrees = radiansToDegrees(atan2f([[transformMatrix b] floatValue], [[transformMatrix a] floatValue]));
+          if ((fabsf(degrees) + ROTATION_EPSILON) >= 180.0f) {
+            NSNumber *degreeOffset = [NSNumber numberWithFloat:((degrees > 0) ? -ROTATION_EPSILON : ROTATION_EPSILON)];
+            [self setTransform:[transformMatrix rotate:[NSArray arrayWithObject:degreeOffset]]];
+          }
         }
         [(TiUIView *)view_ setTransform_:transform];
       }
@@ -595,11 +637,22 @@
       }
     };
 
-    [UIView animateWithDuration:animationDuration
-                          delay:([delay doubleValue] / 1000)
-                        options:options
-                     animations:animation
-                     completion:complete];
+    if (dampingRatio != nil || springVelocity != nil) {
+      [UIView animateWithDuration:animationDuration
+                            delay:([delay doubleValue] / 1000)
+           usingSpringWithDamping:[dampingRatio floatValue]
+            initialSpringVelocity:[springVelocity floatValue]
+                          options:options
+                       animations:animation
+                       completion:complete];
+    } else {
+      [UIView animateWithDuration:animationDuration
+                            delay:([delay doubleValue] / 1000)
+                          options:options
+                       animations:animation
+                       completion:complete];
+    }
+
   } else {
     BOOL perform = YES;
 

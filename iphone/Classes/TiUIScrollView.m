@@ -147,7 +147,6 @@
 
 - (void)adjustScrollViewInsets
 {
-#if IS_XCODE_9
   id viewProxy = self.proxy;
   while (viewProxy && ![viewProxy isKindOfClass:[TiWindowProxy class]]) {
     viewProxy = [viewProxy parent];
@@ -160,7 +159,6 @@
       [scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
     }
   }
-#endif
 }
 
 - (id)accessibilityElement
@@ -229,9 +227,10 @@
 #ifndef TI_USE_AUTOLAYOUT
   if (!needsHandleContentSize) {
     needsHandleContentSize = YES;
-    TiThreadPerformOnMainThread(^{
-      [self handleContentSize];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self handleContentSize];
+        },
         NO);
   }
 #endif
@@ -316,7 +315,7 @@
 - (void)scrollToBottom
 {
   /*
-     * Calculate the bottom height & width and, sets the offset from the 
+     * Calculate the bottom height & width and, sets the offset from the
      * content view’s origin that corresponds to the receiver’s origin.
      */
   UIScrollView *currScrollView = [self scrollView];
@@ -362,18 +361,16 @@
 
 - (void)setRefreshControl_:(id)args
 {
+#ifdef USE_TI_UIREFRESHCONTROL
   ENSURE_SINGLE_ARG_OR_NIL(args, TiUIRefreshControlProxy);
   [[refreshControl control] removeFromSuperview];
   RELEASE_TO_NIL(refreshControl);
   [[self proxy] replaceValue:args forKey:@"refreshControl" notification:NO];
   if (args != nil) {
     refreshControl = [args retain];
-    if ([TiUtils isIOSVersionOrGreater:@"10.0"]) {
-      [[self scrollView] setRefreshControl:refreshControl.control];
-    } else {
-      [[self scrollView] addSubview:refreshControl.control];
-    }
+    [[self scrollView] setRefreshControl:refreshControl.control];
   }
+#endif
 }
 
 - (void)setShowHorizontalScrollIndicator_:(id)value

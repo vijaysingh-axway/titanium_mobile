@@ -8,15 +8,14 @@
 @import CoreLocation;
 @import UIKit;
 
-
-#import <sys/sysctl.h>
 #import <mach/mach.h>
+#import <sys/sysctl.h>
 #import <sys/utsname.h>
 
-#import <sys/types.h>
-#import <sys/socket.h>
-#import <ifaddrs.h>
 #import <arpa/inet.h>
+#import <ifaddrs.h>
+#import <sys/socket.h>
+#import <sys/types.h>
 
 #ifdef DebugLog
 #undef DebugLog
@@ -42,26 +41,14 @@
 
 @interface APSUtility : NSObject
 
-+(BOOL)isiPad;
-+(NSString*)deviceModel;
-+(NSString *)stringFromHexString:(NSString *)hexString;
-+(NSString*)jsonStringify:(id)value error:(NSError**)error;
-+(id)jsonParse:(NSString*)value error:(NSError**)error;
-+(NSString *) UTCDate;
-+(NSString *)UTCDateForDate:(NSDate*)date;
-+(NSString*)createUUID;
-+(NSString*)appIdentifier;
-+(NSNumber *) numCores;
-+(NSString *)ostype;
-+(NSString *)getArchitecture;
-+(BOOL)isOnline;
-+(NSString *)systemVersion;
-+(NSString *)deviceName;
-+(NSString *)networkType;
-+(NSString*)stringValue:(id)value;
-+(NSDate *)dateForString:(NSString *)dateString;
-+(BOOL) isEmptyString:(NSString*)value;
-+(NSTimeInterval)timeBetweenStartDate:(NSDate *)startDate andEndDate:(NSDate*)endDate;
-+(NSDictionary *)locationDictionary:(CLLocation *)newLocation;
++ (NSString *_Nonnull)deviceModel;
++ (NSString *_Nullable)jsonStringify:(id _Nonnull)value error:(NSError *_Nullable *_Nullable)error;
++ (id _Nullable)jsonParse:(NSString *_Nonnull)value error:(NSError *_Nullable *_Nullable)error;
++ (NSString *_Nonnull)createUUID;
++ (NSString *_Nonnull)appIdentifier;
++ (NSString *_Nonnull)getArchitecture;
++ (NSString *_Nullable)stringValue:(id _Nullable)value;
++ (BOOL)isEmptyString:(NSString *_Nullable)value;
++ (NSDictionary *_Nullable)locationDictionary:(CLLocation *_Nonnull)newLocation;
 
 @end

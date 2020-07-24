@@ -64,10 +64,11 @@ static NSArray *imageKeySequence;
 
 - (void)start:(id)args
 {
-  TiThreadPerformOnMainThread(^{
-    TiUIImageView *iv = (TiUIImageView *)[self view];
-    [iv start];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        TiUIImageView *iv = (TiUIImageView *)[self view];
+        [iv start];
+      },
       NO);
 }
 
@@ -87,19 +88,21 @@ static NSArray *imageKeySequence;
 
 - (void)pause:(id)args
 {
-  TiThreadPerformOnMainThread(^{
-    TiUIImageView *iv = (TiUIImageView *)[self view];
-    [iv pause];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        TiUIImageView *iv = (TiUIImageView *)[self view];
+        [iv pause];
+      },
       NO);
 }
 
 - (void)resume:(id)args
 {
-  TiThreadPerformOnMainThread(^{
-    TiUIImageView *iv = (TiUIImageView *)[self view];
-    [iv resume];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        TiUIImageView *iv = (TiUIImageView *)[self view];
+        [iv resume];
+      },
       NO);
 }
 
@@ -148,13 +151,13 @@ static NSArray *imageKeySequence;
     UIImage *image = [[ImageLoader sharedLoader] loadImmediateImage:url_];
 
     if (image != nil) {
-      return [[[TiBlob alloc] _initWithPageContext:[self pageContext] andImage:image] autorelease];
+      return [[[TiBlob alloc] initWithImage:image] autorelease];
     }
 
     // we're on the non-UI thread, we need to block to load
 
     image = [[ImageLoader sharedLoader] loadRemote:url_];
-    return [[[TiBlob alloc] _initWithPageContext:[self pageContext] andImage:image] autorelease];
+    return [[[TiBlob alloc] initWithImage:image] autorelease];
   }
   return nil;
 }

@@ -9,7 +9,9 @@
 #import "TiApp.h"
 #import "TiErrorController.h"
 #import "TiLayoutQueue.h"
+#import "TiSharedConfig.h"
 #import "TiUtils.h"
+#import "TiViewController.h"
 
 #ifdef FORCE_WITH_MODAL
 @interface ForcingController : UIViewController {
@@ -148,6 +150,10 @@
       return UIStatusBarStyleDefault;
     } else if ([theString isEqualToString:@"UIStatusBarStyleBlackTranslucent"] || [theString isEqualToString:@"UIStatusBarStyleLightContent"] || [theString isEqualToString:@"UIStatusBarStyleBlackOpaque"]) {
       return UIStatusBarStyleLightContent;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+    } else if ([theString isEqualToString:@"UIStatusBarStyleDarkContent"]) {
+      return UIStatusBarStyleDarkContent;
+#endif
     }
   }
   return UIStatusBarStyleDefault;
@@ -209,14 +215,10 @@
   UIColor *chosenColor = bgColor;
 
   if (chosenColor == nil) {
-#if defined(DEFAULT_BGCOLOR_RED) && defined(DEFAULT_BGCOLOR_GREEN) && defined(DEFAULT_BGCOLOR_BLUE)
-    chosenColor = [UIColor colorWithRed:DEFAULT_BGCOLOR_RED
-                                  green:DEFAULT_BGCOLOR_GREEN
-                                   blue:DEFAULT_BGCOLOR_BLUE
-                                  alpha:1.0f];
-#else
-    chosenColor = [UIColor blackColor];
-#endif
+    chosenColor = [[TiSharedConfig defaultConfig] defaultBackgroundColor];
+    if (chosenColor == nil) {
+      chosenColor = UIColor.blackColor;
+    }
   }
 
   [ourView setBackgroundColor:chosenColor];
@@ -235,9 +237,10 @@
   }
   [bgImage release];
   bgImage = [newImage retain];
-  TiThreadPerformOnMainThread(^{
-    [self updateBackground];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self updateBackground];
+      },
       NO);
 }
 
@@ -248,9 +251,10 @@
   }
   [bgColor release];
   bgColor = [newColor retain];
-  TiThreadPerformOnMainThread(^{
-    [self updateBackground];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self updateBackground];
+      },
       NO);
 }
 
@@ -688,9 +692,11 @@
   }
 }
 
-#if defined(DEBUG) || defined(DEVELOPER)
 - (void)shutdownUi:(id)arg
 {
+  if (![TiSharedConfig defaultConfig].debugEnabled) {
+    return;
+  }
   //FIRST DISMISS ALL MODAL WINDOWS
   UIViewController *topVC = [self topPresentedController];
   if (topVC != self) {
@@ -727,7 +733,6 @@
     DebugLog(@"[WARN] Could not resume. No selector _resumeRestart: found for arg");
   }
 }
-#endif
 
 #pragma mark - TiControllerContainment
 - (BOOL)canHostWindows
@@ -822,6 +827,10 @@
     }
   }
   [self dismissKeyboard];
+  if ([theController isKindOfClass:[TiViewController class]] && theController.popoverPresentationController == nil) {
+    TiViewController *controller = (TiViewController *)theController;
+    controller.presentationController.delegate = controller;
+  }
   [topVC presentViewController:theController animated:trulyAnimated completion:nil];
 }
 
@@ -1190,9 +1199,9 @@
 
   if ([[UIApplication sharedApplication] statusBarOrientation] != target) {
     forcingRotation = YES;
-#if defined(DEBUG) || defined(DEVELOPER)
-    DebugLog(@"Forcing rotation to %d. Current Orientation %d. This is not good UI design. Please reconsider.", target, [[UIApplication sharedApplication] statusBarOrientation]);
-#endif
+    if ([TiSharedConfig defaultConfig].debugEnabled) {
+      DebugLog(@"Forcing rotation to %d. Current Orientation %d. This is not good UI design. Please reconsider.", target, [[UIApplication sharedApplication] statusBarOrientation]);
+    }
 #ifdef FORCE_WITH_MODAL
     [self forceRotateToOrientation:target];
 #else
@@ -1367,7 +1376,7 @@
     [self updateStatusBar];
   }
 
-  if ([TiUtils isIOSVersionOrGreater:@"11.0"]) {
+  if ([TiUtils isIOSVersionOrGreater:@"11.0"] && [self respondsToSelector:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden)]) {
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
   }
 }
@@ -1417,6 +1426,9 @@
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection;
 {
   [self resetTransformAndForceLayout:YES];
+
+  [[NSNotificationCenter defaultCenter] postNotificationName:kTiTraitCollectionChanged object:self];
+
   [super traitCollectionDidChange:previousTraitCollection];
 }
 

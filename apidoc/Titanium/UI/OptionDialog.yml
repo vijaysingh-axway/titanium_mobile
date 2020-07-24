@@ -5,14 +5,9 @@ summary: |
     in the middle of the display on Android and at the bottom edge on iOS. On Android, buttons may
     be added below the options.
 description: |
-    <table id="platformComparison">
-      <tr>
-        <td><img src="images/optiondialog/optiondialog_android.png" height="75" /></td>
-        <td><img src="images/optiondialog/optiondialog_iphone.png" height="75" /></td>
-        <td><img src="images/optiondialog/optiondialog_ipad.png" height="75" /></td>
-      </tr>
-      <tr><th>Android</th><th>iPhone</th><td>iPad</td></tr>
-    </table>
+    | Android | iPhone | iPad |
+    | ------- | ------ | ---- |
+    | ![Android](./optiondialog_android.png) | ![iPhone](./optiondialog_iphone.png) | ![iPad](./optiondialog_ipad.png) |
 
     An option dialog is created using <Titanium.UI.createOptionDialog> or Alloy `<OptionDialog>`
     element. See Examples below for usage.
@@ -112,6 +107,7 @@ events:
         type: Number
         platforms: [iphone, ipad]
 
+# FIXME: I think Android does support AnimatedOptions for show/hide (separately, versus how ios only really takes show and uses the animated value for hide), defaulting to false
 methods:
   - name: show
     summary: Shows this dialog.
@@ -120,6 +116,7 @@ methods:
         `params` argument, as a popover-like dialog attached to another view or control.
     parameters:
       - name: params
+        # FIXME: I think this is used on iOS, not just iPad
         summary: Argument containing parameters for this method. Only used on iPad.
         type: showParams
         optional: true
@@ -144,20 +141,22 @@ properties:
         In an Alloy application you can specify this property with either an `<AndroidView/>` or
         `<View/>` element inside the `<OptionDialog/>` element, for example:
 
-            <Alloy>
-                <OptionDialog id="dialog" title="Delete File?" onClick="clickCB">
+        ``` xml
+        <Alloy>
+            <OptionDialog id="dialog" title="Delete File?" onClick="clickCB">
 
-                    <!-- Add View or AndroidView for the androidView property -->
-                    <AndroidView platform="android" layout="vertical">
-                        <Label color="red" text="Warning!  This change is permanent and you cannot undo it!" />
-                    </AndroidView>
+                <!-- Add View or AndroidView for the androidView property -->
+                <AndroidView platform="android" layout="vertical">
+                    <Label color="red" text="Warning!  This change is permanent and you cannot undo it!" />
+                </AndroidView>
 
-                    <ButtonNames>
-                        <ButtonName>Confirm</ButtonName>
-                        <ButtonName>Cancel</ButtonName>
-                    </ButtonNames>
-                </OptionDialog>
-            </Alloy>
+                <ButtonNames>
+                    <ButtonName>Confirm</ButtonName>
+                    <ButtonName>Cancel</ButtonName>
+                </ButtonNames>
+            </OptionDialog>
+        </Alloy>
+        ```
     type: Titanium.UI.View
     platforms: [android]
 
@@ -225,7 +224,8 @@ properties:
     platforms: [android, iphone, ipad]
 
   - name: selectedIndex
-    summary: Defines the default selected option.
+    summary: Defines the default selected option. Since `8.1.0`, if not defined or -1 it will show a
+        normal list instead of radio buttons.
     platforms: [android]
     type: Number
     availability: creation
@@ -241,7 +241,7 @@ properties:
 examples:
   - title: Dialog with 3 Options
     example: |
-
+        ``` js
         Ti.UI.setBackgroundColor('white');
         var win = Ti.UI.createWindow({
           title: 'Click window to test',
@@ -260,10 +260,11 @@ examples:
           var dialog = Ti.UI.createOptionDialog(opts).show();
         });
         win.open();
+        ```
 
   - title: Dialog with 2 Options and 1 Button on Android and 3 Options on iOS
     example: |
-
+        ``` js
         var win = Ti.UI.createWindow({
           title: 'Click window to test OptionDialog',
           backgroundColor: 'white'
@@ -309,50 +310,56 @@ examples:
         }
 
         win.open();
+        ```
 
   - title: Alloy XML Markup
     example: |
-        Previous example as an Alloy view.
+        Previous example as an Alloy view. You can set [cancel](Titanium.UI.OptionDialog.cancel)
+        and [destructive](Titanium.UI.OptionDialog.destructive) on a `<Option/>` tag.
 
         optiondialog.xml:
+        ``` xml
+        <Alloy>
+            <Window id="win" onClick="showOptions" title="Click window to test"
+                fullscreen="false" onExit="true" backgroundColor="white">
 
-            <Alloy>
-                <Window id="win" onClick="showOptions" title="Click window to test"
-                    fullscreen="false" onExit="true" backgroundColor="white">
+                <!--
+                    The OptionDialog tag declares an option dialog,
+                    which will need to be opened by the controller.
+                -->
+                <OptionDialog id="dialog" title="Delete File?">
 
-                    <!--
-                        The OptionDialog tag declares an option dialog,
-                        which will need to be opened by the controller.
-                    -->
-                    <OptionDialog id="dialog" title="Delete File?">
+                    <!-- The Options tag sets the options property. -->
+                    <Options>
+                        <Option destructive="true">Confirm</Option>
+                        <Option platform="ios">Help</Option>
+                        <Option cancel="true">Cancel</Option>
+                    </Options>
 
-                        <!-- The Options tag sets the options property. -->
-                        <Options>
-                            <Option>Confirm</Option>
-                            <Option platform="ios">Help</Option>
-                            <Option>Cancel</Option>
-                        </Options>
+                    <!-- The ButtonNames tag sets the Android-only buttonNames property. -->
+                    <ButtonNames>
+                        <ButtonName>Help</ButtonName>
+                    </ButtonNames>
 
-                        <!-- The ButtonNames tag sets the Android-only buttonNames property. -->
-                        <ButtonNames>
-                            <ButtonName>Help</ButtonName>
-                        </ButtonNames>
+                    <!-- Add a View for the androidView property here. -->
 
-                        <!-- Add a View for the androidView property here. -->
+                </OptionDialog>
 
-                    </OptionDialog>
+                <!-- Add views here -->
 
-                    <!-- Add views here -->
-
-                </Window>
-            </Alloy>
+            </Window>
+        </Alloy>
+        ```
 
         optiondialog.js:
+        ``` js
+        function showOptions(){
+            $.dialog.show();
+        }
+        ```
 
-            function showOptions(){
-                $.dialog.show();
-            }
 ---
+# FIXME: I don't think we actually take any args any more, it inherits the animated value from show on iOS!
 name: hideParams
 summary: Dictionary of options for the <Titanium.UI.OptionDialog.hide> method.
 since: 2.0.0
@@ -372,6 +379,7 @@ properties:
   - name: animated
     summary: Determines whether to animate the dialog as it is shown.
     type: Boolean
+    optional: true
 
   - name: view
     summary: View to which to attach the dialog.
@@ -383,3 +391,4 @@ properties:
         Setting the x, y coordinates to (0, 0) places the dialog in the top-left corner of the
         view object.  Set both the `width` and `height` properties to 1.
     type: Dimension
+    optional: true

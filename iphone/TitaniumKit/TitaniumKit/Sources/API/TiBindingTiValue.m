@@ -32,9 +32,7 @@ NSDictionary *TiBindingTiValueToNSDictionary(JSContextRef jsContext, JSValueRef 
 {
   JSObjectRef obj = JSValueToObject(jsContext, objRef, NULL);
   JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(jsContext, obj);
-
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-
   size_t count = JSPropertyNameArrayGetCount(props);
   for (size_t i = 0; i < count; i++) {
     JSStringRef jsString = JSPropertyNameArrayGetNameAtIndex(props, i);
@@ -46,23 +44,30 @@ NSDictionary *TiBindingTiValueToNSDictionary(JSContextRef jsContext, JSValueRef 
     }
     [jsonkey release];
   }
+  JSPropertyNameArrayRelease(props);
 
-  // if this looks like a JS Error object, get the message
-  if ([dict objectForKey:@"line"] != nil && [dict objectForKey:@"column"] != nil) {
-    JSStringRef messageKeyRef = JSStringCreateWithUTF8CString("message");
-    JSStringRef stackKeyRef = JSStringCreateWithUTF8CString("stack");
-    JSValueRef messageRef = JSObjectGetProperty(jsContext, obj, messageKeyRef, NULL);
-    JSValueRef stackRef = JSObjectGetProperty(jsContext, obj, stackKeyRef, NULL);
-
-    id message = TiBindingTiValueToNSObject(jsContext, messageRef);
-    if (message && ![message isEqual:[NSNull null]]) {
+  // if this looks like a JS Error object, get related non-enumerable properties
+  JSContext *context = [JSContext contextWithJSGlobalContextRef:JSContextGetGlobalContext(jsContext)];
+  JSValue *value = [JSValue valueWithJSValueRef:objRef inContext:context];
+  if ([value hasProperty:@"line"] && [value hasProperty:@"column"]) {
+    if ([dict objectForKey:@"message"] == nil && [value hasProperty:@"message"]) {
+      NSString *message = [value[@"message"] toString];
       [dict setObject:message forKey:@"message"];
     }
-    JSStringRelease(messageKeyRef);
-
-    id stack = TiBindingTiValueToNSObject(jsContext, stackRef);
-    if (stack && ![stack isEqual:[NSNull null]]) {
-
+    if ([dict objectForKey:@"line"] == nil && [value hasProperty:@"line"]) {
+      NSNumber *line = [value[@"line"] toNumber];
+      [dict setObject:line forKey:@"line"];
+    }
+    if ([dict objectForKey:@"column"] == nil && [value hasProperty:@"column"]) {
+      NSNumber *column = [value[@"column"] toNumber];
+      [dict setObject:column forKey:@"column"];
+    }
+    if ([dict objectForKey:@"sourceURL"] == nil && [value hasProperty:@"sourceURL"]) {
+      NSString *sourceURL = [value[@"sourceURL"] toString];
+      [dict setObject:sourceURL forKey:@"sourceURL"];
+    }
+    if ([dict objectForKey:@"stack"] == nil && [value hasProperty:@"stack"]) {
+      NSString *stack = [value[@"stack"] toString];
       // lets re-format the stack similar to node.js
       stack = [stack stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"file://%@", [[NSBundle mainBundle] bundlePath]] withString:@"("];
       stack = [stack stringByReplacingOccurrencesOfString:@"\n" withString:@")\n    at "];
@@ -72,10 +77,7 @@ NSDictionary *TiBindingTiValueToNSDictionary(JSContextRef jsContext, JSValueRef 
 
       [dict setObject:stack forKey:@"stack"];
     }
-    JSStringRelease(stackKeyRef);
   }
-
-  JSPropertyNameArrayRelease(props);
 
   return [dict autorelease];
 }
@@ -122,8 +124,12 @@ NSObject *TiBindingTiValueToNSObject(JSContextRef jsContext, JSValueRef objRef)
       return privateObject;
     }
 
-    // This is a special Hyperloop wrapped object, unwrap it
+    // No private object, so this may be:
+    // - a standard JS object (Array, Date, Function, Object)
+    // - A JS object wrapping a new-style obj-c proxy (JSExport)
+    // - A JS object wrapper for hyperloop holding a $native property that is the native proxy
     if (privateObject == nil) {
+      // First, check for special hyperloop $native property
       JSStringRef jsString = JSStringCreateWithUTF8CString("$native");
       JSValueRef jsValue = JSObjectGetProperty(jsContext, obj, jsString, NULL);
       JSStringRelease(jsString);
@@ -132,6 +138,15 @@ NSObject *TiBindingTiValueToNSObject(JSContextRef jsContext, JSValueRef objRef)
         if (privateObject != nil) {
           return privateObject;
         }
+      }
+
+      // Next, try to convert to new-style obj-c proxy!
+      JSGlobalContextRef globalContext = JSContextGetGlobalContext(jsContext);
+      JSContext *context = [JSContext contextWithJSGlobalContextRef:globalContext];
+      JSValue *objcJSValue = [JSValue valueWithJSValueRef:objRef inContext:context];
+      id whatever = [objcJSValue toObject]; // For typical JS Object, this will become an NSDictionary*, which we could cheat and re-use below instead of calling TiBindingTiValueToNSDictionary (though it'd have to handle the Error special case)
+      if (whatever != nil && [whatever conformsToProtocol:@protocol(JSExport)]) {
+        return whatever;
       }
     }
 
@@ -157,12 +172,12 @@ NSObject *TiBindingTiValueToNSObject(JSContextRef jsContext, JSValueRef objRef)
       JSValueRef resultDate = JSObjectCallAsFunction(jsContext, fnObj, obj, 0, NULL, NULL);
       double value = JSValueToNumber(jsContext, resultDate, NULL);
       return [NSDate dateWithTimeIntervalSince1970:value / 1000]; // ms for JS, sec for Obj-C
-      break;
     }
     if (JSObjectIsFunction(jsContext, obj)) {
       KrollContext *context = GetKrollContext(jsContext);
       return [[[KrollCallback alloc] initWithCallback:obj thisObject:JSContextGetGlobalObject(jsContext) context:context] autorelease];
     }
+
     return TiBindingTiValueToNSDictionary(jsContext, objRef);
   }
   default: {
@@ -202,10 +217,9 @@ JSValueRef TiBindingTiValueFromProxy(JSContextRef jsContext, TiProxy *obj)
       return [[ourBridge registerProxy:obj] jsobject];
     }
     KrollObject *objKrollObject = [ourBridge krollObjectForProxy:obj];
-#ifdef USE_JSCORE_FRAMEWORK
+    JSValueRef valueRef = [objKrollObject jsobject];
     [objKrollObject removeGarbageCollectionSafeguard];
-#endif
-    return [objKrollObject jsobject];
+    return valueRef;
   }
 
   DebugLog(@"[WARN] Generating a new JSObject for KrollObject %@ because the contexts %@ and its context %@ differed.", obj, context, ourBridge);
@@ -215,6 +229,10 @@ JSValueRef TiBindingTiValueFromProxy(JSContextRef jsContext, TiProxy *obj)
 
 JSValueRef TiBindingTiValueFromNSObject(JSContextRef jsContext, NSObject *obj)
 {
+  if ([obj conformsToProtocol:@protocol(JSExport)]) {
+    JSContext *objcContext = [JSContext contextWithJSGlobalContextRef:JSContextGetGlobalContext(jsContext)];
+    return [[JSValue valueWithObject:obj inContext:objcContext] JSValueRef];
+  }
   if ([obj isKindOfClass:[NSNull class]]) {
     return JSValueMakeNull(jsContext);
   }
@@ -274,12 +292,19 @@ JSValueRef TiBindingTiValueFromNSObject(JSContextRef jsContext, NSObject *obj)
 
     // Add "nativeStack" key
     NSArray<NSString *> *nativeStack = [(NSException *)obj callStackSymbols];
+    NSInteger startIndex = 3; // Starting at index = 4 to not include the script-error API's
+    if (nativeStack == nil) { // the exception was created, but never thrown, so grab the current stack frames
+      nativeStack = [NSThread callStackSymbols]; // this happens when we construct an exception manually in our ENSURE macros for obj-c proxies
+      startIndex = 2; // drop ObjcProxy.throwException and this method from frames
+    }
     if (nativeStack != nil) {
       NSMutableArray<NSString *> *formattedStackTrace = [[[NSMutableArray alloc] init] autorelease];
       NSUInteger exceptionStackTraceLength = [nativeStack count];
+      NSUInteger twentiethIndex = 20 + startIndex; // keep up to 20 frames
+      NSUInteger endIndex = (exceptionStackTraceLength >= twentiethIndex ? twentiethIndex : exceptionStackTraceLength);
 
-      // re-size stack trace and format results. Starting at index = 4 to not include the script-error API's
-      for (NSInteger i = 3; i < (exceptionStackTraceLength >= 20 ? 20 : exceptionStackTraceLength); i++) {
+      // re-size stack trace and format results
+      for (NSUInteger i = startIndex; i < endIndex; i++) {
         NSString *line = [[nativeStack objectAtIndex:i] stringByReplacingOccurrencesOfString:@"     " withString:@""];
         [formattedStackTrace addObject:line];
       }

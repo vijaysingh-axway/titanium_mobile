@@ -128,9 +128,11 @@ KrollContext *GetKrollContext(JSContextRef context)
 
 JSValueRef ThrowException(JSContextRef ctx, NSString *message, JSValueRef *exception)
 {
-  JSStringRef jsString = JSStringCreateWithCFString((CFStringRef)message);
-  *exception = JSValueMakeString(ctx, jsString);
-  JSStringRelease(jsString);
+  JSGlobalContextRef globalContextRef = JSContextGetGlobalContext(ctx);
+  JSContext *context = [JSContext contextWithJSGlobalContextRef:globalContextRef];
+  JSValue *value = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+  *exception = value.JSValueRef;
+
   return JSValueMakeUndefined(ctx);
 }
 
@@ -161,7 +163,14 @@ static JSValueRef LCallback(JSContextRef jsContext, JSObjectRef jsFunction, JSOb
 
   KrollContext *ctx = GetKrollContext(jsContext);
   NSString *key = [KrollObject toID:ctx value:args[0]];
-  NSString *comment = argCount > 1 ? [KrollObject toID:ctx value:args[1]] : nil;
+  NSString *comment = nil;
+  // ignore non-String default values
+  if (argCount > 1) {
+    id defaultValue = [KrollObject toID:ctx value:args[1]];
+    if ([defaultValue isKindOfClass:[NSString class]]) {
+      comment = (NSString *)defaultValue;
+    }
+  }
   @try {
     id result = [TiLocale getString:key comment:comment];
     return [KrollObject toValue:ctx value:result];
@@ -179,10 +188,16 @@ static JSValueRef AlertCallback(JSContextRef jsContext, JSObjectRef jsFunction, 
   }
 
   KrollContext *ctx = GetKrollContext(jsContext);
-  NSString *message = [KrollObject toID:ctx value:args[0]];
+  NSString *message = [TiUtils stringValue:[KrollObject toID:ctx value:args[0]]];
+
+  [[[TiApp app] controller] incrementActiveAlertControllerCount];
 
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:nil]];
+  [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                            style:UIAlertActionStyleDefault
+                                          handler:^(UIAlertAction *_Nonnull action) {
+                                            [[[TiApp app] controller] decrementActiveAlertControllerCount];
+                                          }]];
   [[TiApp app] showModalController:alert animated:YES];
 
   return JSValueMakeUndefined(jsContext);
@@ -520,10 +535,8 @@ static JSValueRef StringFormatDecimalCallback(JSContextRef jsContext, JSObjectRe
   [self jsInvokeInContext:context exception:&exception];
 
   if (exception != NULL) {
-    id excm = [KrollObject toID:context value:exception];
-    [[TiExceptionHandler defaultExceptionHandler] reportScriptError:[TiUtils scriptErrorValue:excm]];
+    [TiExceptionHandler.defaultExceptionHandler reportScriptError:exception inKrollContext:context];
     pthread_mutex_unlock(&KrollEntryLock);
-    @throw excm;
   }
   pthread_mutex_unlock(&KrollEntryLock);
 }
@@ -535,10 +548,8 @@ static JSValueRef StringFormatDecimalCallback(JSContextRef jsContext, JSObjectRe
   JSValueRef result = [self jsInvokeInContext:context exception:&exception];
 
   if (exception != NULL) {
-    id excm = [KrollObject toID:context value:exception];
-    [[TiExceptionHandler defaultExceptionHandler] reportScriptError:[TiUtils scriptErrorValue:excm]];
+    [TiExceptionHandler.defaultExceptionHandler reportScriptError:exception inKrollContext:context];
     pthread_mutex_unlock(&KrollEntryLock);
-    @throw excm;
   }
   pthread_mutex_unlock(&KrollEntryLock);
 
@@ -678,9 +689,10 @@ static JSValueRef StringFormatDecimalCallback(JSContextRef jsContext, JSObjectRe
                                  userInfo:nil];
   }
   stopped = NO;
-  TiThreadPerformOnMainThread(^{
-    [self main];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self main];
+      },
       NO);
 }
 
@@ -751,14 +763,14 @@ static JSValueRef StringFormatDecimalCallback(JSContextRef jsContext, JSObjectRe
   [self invoke:invocation];
 }
 
-- (void)invokeBlockOnThread:(void (^)())block
+- (void)invokeBlockOnThread:(void (^)(void))block
 {
   pthread_mutex_lock(&KrollEntryLock);
   block();
   pthread_mutex_unlock(&KrollEntryLock);
 }
 
-+ (void)invokeBlock:(void (^)())block
++ (void)invokeBlock:(void (^)(void))block
 {
   pthread_mutex_lock(&KrollEntryLock);
   block();

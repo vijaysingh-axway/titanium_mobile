@@ -25,9 +25,10 @@
 - (void)dealloc
 {
   if (controller != nil) {
-    TiThreadPerformOnMainThread(^{
-      RELEASE_TO_NIL(controller);
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          RELEASE_TO_NIL(controller);
+        },
         YES);
   }
 
@@ -46,6 +47,7 @@
 
 - (void)_configure
 {
+  forceModal = YES;
   [self replaceValue:nil forKey:@"orientationModes" notification:NO];
   [super _configure];
 }
@@ -97,6 +99,13 @@
   }
 }
 
+- (void)fireFocusEvent
+{
+  if ([self _hasListeners:@"focus"]) {
+    [self fireEvent:@"focus" withObject:nil withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
+  }
+}
+
 - (void)windowDidOpen
 {
   opening = NO;
@@ -104,10 +113,8 @@
   if ([self _hasListeners:@"open"]) {
     [self fireEvent:@"open" withObject:nil withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
   }
-  if (focussed && [self handleFocusEvents]) {
-    if ([self _hasListeners:@"focus"]) {
-      [self fireEvent:@"focus" withObject:nil withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
-    }
+  if (focussed) {
+    [self fireFocusEvent];
   }
   [super windowDidOpen];
   [self forgetProxy:openAnimation];
@@ -255,14 +262,8 @@
   }
 
   int theStyle = [TiUtils intValue:[self valueForUndefinedKey:@"statusBarStyle"] def:[[[TiApp app] controller] defaultStatusBarStyle]];
-  switch (theStyle) {
-  case UIStatusBarStyleDefault:
-  case UIStatusBarStyleLightContent:
-    barStyle = theStyle;
-    break;
-  default:
-    barStyle = UIStatusBarStyleDefault;
-  }
+
+  [self assignStatusBarStyle:theStyle];
 
   if (!isModal && (tab == nil)) {
     openAnimation = [[TiAnimation animationFromArg:args context:[self pageContext] create:NO] retain];
@@ -273,41 +274,37 @@
   _supportedOrientations = [TiUtils TiOrientationFlagsFromObject:object];
 
   //GO ahead and call open on the UI thread
-  TiThreadPerformOnMainThread(^{
-    [self openOnUIThread:args];
-  },
-      YES);
+  TiThreadPerformOnMainThread(
+      ^{
+        [self openOnUIThread:args];
+      },
+      NO);
 }
 
 - (void)setStatusBarStyle:(id)style
 {
   int theStyle = [TiUtils intValue:style def:[[[TiApp app] controller] defaultStatusBarStyle]];
-  switch (theStyle) {
-  case UIStatusBarStyleDefault:
-  case UIStatusBarStyleLightContent:
-    barStyle = theStyle;
-    break;
-  default:
-    barStyle = UIStatusBarStyleDefault;
-  }
+  [self assignStatusBarStyle:theStyle];
   [self setValue:NUMINT(barStyle) forUndefinedKey:@"statusBarStyle"];
   if (focussed) {
-    TiThreadPerformOnMainThread(^{
-      [[[TiApp app] controller] updateStatusBar];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [[[TiApp app] controller] updateStatusBar];
+        },
         YES);
   }
 }
 
 - (void)close:(id)args
 {
-  //I am not open. Go Away
-  if (opening) {
-    DebugLog(@"Window is opening. Ignoring this close call");
-    return;
-  }
-
   if (!opened) {
+    // If I've been asked to open but haven't yet, short-circuit it and tell it not to open
+    if (opening) {
+      opening = NO; // _handleOpen: should check this and abort opening
+      DebugLog(@"Window is not open yet. Attempting to stop it from opening...");
+      return;
+    }
+
     DebugLog(@"Window is not open. Ignoring this close call");
     return;
   }
@@ -334,10 +331,21 @@
   [self rememberProxy:closeAnimation];
 
   //GO ahead and call close on UI thread
-  TiThreadPerformOnMainThread(^{
-    [self closeOnUIThread:args];
-  },
-      YES);
+  TiThreadPerformOnMainThread(
+      ^{
+        [self closeOnUIThread:args];
+      },
+      NO);
+}
+
+- (NSNumber *)closed
+{
+  return NUMBOOL(!opening && !opened && !closing);
+}
+
+- (NSNumber *)focused
+{
+  return NUMBOOL(focussed);
 }
 
 - (BOOL)_handleOpen:(id)args
@@ -352,6 +360,11 @@
     DeveloperLog(@"[WARN] The top View controller is not a container controller. This window will open behind the presented controller without animations.")
         [self forgetProxy:openAnimation];
     RELEASE_TO_NIL(openAnimation);
+  }
+
+  // Did someone try to close before we ever finished opening?
+  if (!opening) {
+    return NO;
   }
 
   return YES;
@@ -440,10 +453,8 @@
 {
   if (!focussed) {
     focussed = YES;
-    if ([self handleFocusEvents] && opened) {
-      if ([self _hasListeners:@"focus"]) {
-        [self fireEvent:@"focus" withObject:nil withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
-      }
+    if (opened) {
+      [self fireFocusEvent];
     }
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
     [[self view] setAccessibilityElementsHidden:NO];
@@ -456,9 +467,10 @@
     }
     [self processForSafeArea];
   }
-  TiThreadPerformOnMainThread(^{
-    [self forceNavBarFrame];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self forceNavBarFrame];
+      },
       NO);
 }
 
@@ -503,6 +515,21 @@
 - (TiProxy *)tabGroup
 {
   return [tab tabGroup];
+}
+
+- (void)assignStatusBarStyle:(int)style
+{
+  switch (style) {
+  case UIStatusBarStyleDefault:
+  case UIStatusBarStyleLightContent:
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+  case UIStatusBarStyleDarkContent:
+#endif
+    barStyle = style;
+    break;
+  default:
+    barStyle = UIStatusBarStyleDefault;
+  }
 }
 
 - (NSNumber *)orientation
@@ -550,14 +577,21 @@
       if (style != -1) {
         [theController setModalTransitionStyle:style];
       }
-      style = [TiUtils intValue:@"modalStyle" properties:dict def:-1];
-      if (style != -1) {
+      UIModalPresentationStyle modalStyle = [TiUtils intValue:@"modalStyle" properties:dict def:-1];
+      if (modalStyle != -1) {
         // modal transition style page curl must be done only in fullscreen
         // so only allow if not page curl
         if ([theController modalTransitionStyle] != UIModalTransitionStylePartialCurl) {
-          [theController setModalPresentationStyle:style];
+          [theController setModalPresentationStyle:modalStyle];
         }
       }
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+      if ([TiUtils isIOSVersionOrGreater:@"13.0"]) {
+        forceModal = [TiUtils boolValue:@"forceModal" properties:dict def:NO];
+        theController.modalInPresentation = forceModal;
+      }
+#endif
       BOOL animated = [TiUtils boolValue:@"animated" properties:dict def:YES];
       [[TiApp app] showModalController:theController animated:animated];
     } else {
@@ -732,6 +766,20 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
   if (isModal && closing) {
+    [self windowDidClose];
+  }
+}
+
+- (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController
+{
+  if (isModal) {
+    [self windowWillClose];
+  }
+}
+
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController
+{
+  if (isModal) {
     [self windowDidClose];
   }
 }

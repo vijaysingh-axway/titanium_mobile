@@ -1,14 +1,17 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2010-2015 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2010-2020 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 
 #import "TiUIiOSProxy.h"
+
+#ifdef USE_TI_UIIOS
+
+#import <TitaniumKit/TiBlob.h>
 #import <TitaniumKit/TiUtils.h>
 #import <TitaniumKit/Webcolor.h>
-#ifdef USE_TI_UIIOS
 
 #ifdef USE_TI_UIIOSPREVIEWCONTEXT
 #import "TiUIiOSPreviewActionGroupProxy.h"
@@ -97,6 +100,13 @@
 #import "TiUIiOSFeedbackGeneratorProxy.h"
 #endif
 
+#ifdef USE_TI_UIWEBVIEW
+#import "TiUIiOSWebViewConfigurationProxy.h"
+#import "TiUIiOSWebViewDecisionHandlerProxy.h"
+#import "TiUIiOSWebViewProcessPoolProxy.h"
+#import <WebKit/WebKit.h>
+#endif
+
 @implementation TiUIiOSProxy
 
 #define FORGET_AND_RELEASE(x) \
@@ -120,9 +130,25 @@
   ENSURE_UI_THREAD(setStatusBarBackgroundColor, value);
   ENSURE_SINGLE_ARG(value, NSString);
 
-  UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-  if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
-    statusBar.backgroundColor = [[TiUtils colorValue:value] _color];
+  if ([TiUtils isIOSVersionOrGreater:@"13.0"]) {
+#if IS_SDK_IOS_13
+    UIWindow *keyWindow = UIApplication.sharedApplication.keyWindow;
+    CGRect frame = keyWindow.windowScene.statusBarManager.statusBarFrame;
+    UIView *view = [keyWindow viewWithTag:TI_STATUSBAR_TAG];
+    if (!view) {
+      view = [[UIView alloc] initWithFrame:frame];
+      view.tag = TI_STATUSBAR_TAG;
+      [keyWindow addSubview:view];
+    }
+    view.frame = frame;
+    view.backgroundColor = [[TiUtils colorValue:value] _color];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidBecomeKey:) name:UIWindowDidBecomeKeyNotification object:nil];
+#endif
+  } else {
+    UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+      statusBar.backgroundColor = [[TiUtils colorValue:value] _color];
+    }
   }
 }
 
@@ -181,6 +207,8 @@
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
   [super dealloc];
 }
 
@@ -232,6 +260,20 @@
 #endif
   [super didReceiveMemoryWarning:notification];
 }
+
+#if IS_SDK_IOS_13
+- (void)windowDidBecomeKey:(NSNotification *)notification
+{
+  if ([TiUtils isIOSVersionOrGreater:@"13.0"]) {
+    UIWindow *keyWindow = UIApplication.sharedApplication.keyWindow;
+    CGRect frame = keyWindow.windowScene.statusBarManager.statusBarFrame;
+    UIView *view = [keyWindow viewWithTag:TI_STATUSBAR_TAG];
+    if (view) {
+      view.frame = frame;
+    }
+  }
+}
+#endif
 
 #ifdef USE_TI_UIIOSALERTDIALOGSTYLE
 - (TIUIiOSAlertDialogStyleProxy *)AlertDialogStyle
@@ -377,6 +419,18 @@
 }
 #endif
 
+#ifdef IS_SDK_IOS_13
+- (TiBlob *)systemImage:(id)arg
+{
+  if (![TiUtils isIOSVersionOrGreater:@"13.0"]) {
+    return nil;
+  }
+  ENSURE_SINGLE_ARG_OR_NIL(arg, NSString);
+  TiBlob *blob = [[TiBlob alloc] initWithSystemImage:arg];
+  return blob;
+}
+#endif
+
 - (void)setAppBadge:(id)value
 {
   ENSURE_UI_THREAD(setAppBadge, value);
@@ -419,19 +473,31 @@ END_UI_THREAD_PROTECTED_VALUE(appSupportsShakeToEdit)
 
 - (id)BLUR_EFFECT_STYLE_REGULAR
 {
-  if ([TiUtils isIOSVersionOrGreater:@"10.0"]) {
-    return NUMINTEGER(UIBlurEffectStyleRegular);
-  }
-  return [NSNull null];
+  return NUMINTEGER(UIBlurEffectStyleRegular);
 }
 
 - (id)BLUR_EFFECT_STYLE_PROMINENT
 {
-  if ([TiUtils isIOSVersionOrGreater:@"10.0"]) {
-    return NUMINTEGER(UIBlurEffectStyleProminent);
-  }
-  return [NSNull null];
+  return NUMINTEGER(UIBlurEffectStyleProminent);
 }
+
+#if IS_SDK_IOS_13
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_ULTRA_THIN_MATERIAL, UIBlurEffectStyleSystemUltraThinMaterial);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THIN_MATERIAL, UIBlurEffectStyleSystemThinMaterial);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_MATERIAL, UIBlurEffectStyleSystemMaterial);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THICK_MATERIAL, UIBlurEffectStyleSystemThickMaterial);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_CHROME_MATERIAL, UIBlurEffectStyleSystemChromeMaterial);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_ULTRA_THIN_MATERIAL_LIGHT, UIBlurEffectStyleSystemUltraThinMaterialLight);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THIN_MATERIAL_LIGHT, UIBlurEffectStyleSystemThinMaterialLight);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_MATERIAL_LIGHT, UIBlurEffectStyleSystemMaterialLight);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THICK_MATERIAL_LIGHT, UIBlurEffectStyleSystemThickMaterialLight);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_CHROME_MATERIAL_LIGHT, UIBlurEffectStyleSystemChromeMaterialLight);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_ULTRA_THIN_MATERIAL_DARK, UIBlurEffectStyleSystemUltraThinMaterialDark);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THIN_MATERIAL_DARK, UIBlurEffectStyleSystemThinMaterialDark);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_MATERIAL_DARK, UIBlurEffectStyleSystemMaterialDark);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_THICK_MATERIAL_DARK, UIBlurEffectStyleSystemThickMaterialDark);
+MAKE_SYSTEM_PROP(BLUR_EFFECT_STYLE_SYSTEM_CHROME_MATERIAL_DARK, UIBlurEffectStyleSystemChromeMaterialDark);
+#endif
 #endif
 
 #ifdef USE_TI_UIIOSMENUPOPUP
@@ -478,6 +544,7 @@ MAKE_SYSTEM_PROP(KEYBOARD_DISMISS_MODE_INTERACTIVE, UIScrollViewKeyboardDismissM
 #ifdef USE_TI_UIIOSTABBEDBAR
 - (id)createTabbedBar:(id)args
 {
+  DEPRECATED_REPLACED(@"UI.iOS.TabbedBar", @"8.0.0", @"UI.TabbedBar (parity with Android)")
   return [[[TiUIiOSTabbedBarProxy alloc] _initWithPageContext:[self executionContext] args:args] autorelease];
 }
 #endif
@@ -590,7 +657,7 @@ MAKE_SYSTEM_PROP(KEYBOARD_DISMISS_MODE_INTERACTIVE, UIScrollViewKeyboardDismissM
     return nil;
   }
 
-  TiBlob *image = [[[TiBlob alloc] _initWithPageContext:[self pageContext] andImage:badge] autorelease];
+  TiBlob *image = [[[TiBlob alloc] initWithImage:badge] autorelease];
 
   return image;
 }
@@ -677,54 +744,18 @@ MAKE_SYSTEM_PROP(COLLISION_MODE_ALL, 2);
 #endif
 #endif
 
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_NORMAL, kCGBlendModeNormal, @"UI.iOS.BLEND_MODE_NORMAL", @"7.3.0", @"UI.BLEND_MODE_NORMAL");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_MULTIPLY, kCGBlendModeMultiply, @"UI.iOS.BLEND_MODE_MULTIPLY", @"7.3.0", @"UI.BLEND_MODE_MULTIPLY");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SCREEN, kCGBlendModeScreen, @"UI.iOS.BLEND_MODE_SCREEN", @"7.3.0", @"UI.BLEND_MODE_SCREEN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_OVERLAY, kCGBlendModeOverlay, @"UI.iOS.BLEND_MODE_OVERLAY", @"7.3.0", @"UI.BLEND_MODE_OVERLAY");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DARKEN, kCGBlendModeDarken, @"UI.iOS.BLEND_MODE_DARKEN", @"7.3.0", @"UI.BLEND_MODE_DARKEN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_LIGHTEN, kCGBlendModeLighten, @"UI.iOS.BLEND_MODE_LIGHTEN", @"7.3.0", @"UI.BLEND_MODE_LIGHTEN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_COLOR_DODGE, kCGBlendModeColorDodge, @"UI.iOS.BLEND_MODE_COLOR_DODGE", @"7.3.0", @"UI.BLEND_MODE_COLOR_DODGE");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_COLOR_BURN, kCGBlendModeColorBurn, @"UI.iOS.BLEND_MODE_COLOR_BURN", @"7.3.0", @"UI.BLEND_MODE_COLOR_BURN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SOFT_LIGHT, kCGBlendModeSoftLight, @"UI.iOS.BLEND_MODE_SOFT_LIGHT", @"7.3.0", @"UI.BLEND_MODE_SOFT_LIGHT");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_HARD_LIGHT, kCGBlendModeHardLight, @"UI.iOS.BLEND_MODE_HARD_LIGHT", @"7.3.0", @"UI.BLEND_MODE_HARD_LIGHT");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DIFFERENCE, kCGBlendModeDifference, @"UI.iOS.BLEND_MODE_DIFFERENCE", @"7.3.0", @"UI.BLEND_MODE_DIFFERENCE");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_EXCLUSION, kCGBlendModeExclusion, @"UI.iOS.BLEND_MODE_EXCLUSION", @"7.3.0", @"UI.BLEND_MODE_EXCLUSION");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_HUE, kCGBlendModeHue, @"UI.iOS.BLEND_MODE_HUE", @"7.3.0", @"UI.BLEND_MODE_HUE");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SATURATION, kCGBlendModeSaturation, @"UI.iOS.BLEND_MODE_SATURATION", @"7.3.0", @"UI.BLEND_MODE_SATURATION");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_COLOR, kCGBlendModeColor, @"UI.iOS.BLEND_MODE_COLOR", @"7.3.0", @"UI.BLEND_MODE_COLOR");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_LUMINOSITY, kCGBlendModeLuminosity, @"UI.iOS.BLEND_MODE_LUMINOSITY", @"7.3.0", @"UI.BLEND_MODE_LUMINOSITY");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_CLEAR, kCGBlendModeClear, @"UI.iOS.BLEND_MODE_CLEAR", @"7.3.0", @"UI.BLEND_MODE_CLEAR");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_COPY, kCGBlendModeCopy, @"UI.iOS.BLEND_MODE_COPY", @"7.3.0", @"UI.BLEND_MODE_COPY");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SOURCE_IN, kCGBlendModeSourceIn, @"UI.iOS.BLEND_MODE_SOURCE_IN", @"7.3.0", @"UI.BLEND_MODE_SOURCE_IN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SOURCE_OUT, kCGBlendModeSourceOut, @"UI.iOS.BLEND_MODE_SOURCE_OUT", @"7.3.0", @"UI.BLEND_MODE_SOURCE_OUT");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_SOURCE_ATOP, kCGBlendModeSourceAtop, @"UI.iOS.BLEND_MODE_SOURCE_ATOP", @"7.3.0", @"UI.BLEND_MODE_SOURCE_ATOP");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DESTINATION_OVER, kCGBlendModeDestinationOver, @"UI.iOS.BLEND_MODE_DESTINATION_OVER", @"7.3.0", @"UI.BLEND_MODE_DESTINATION_OVER");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DESTINATION_IN, kCGBlendModeDestinationIn, @"UI.iOS.BLEND_MODE_DESTINATION_IN", @"7.3.0", @"UI.BLEND_MODE_DESTINATION_IN");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DESTINATION_OUT, kCGBlendModeDestinationOut, @"UI.iOS.BLEND_MODE_DESTINATION_OUT", @"7.3.0", @"UI.BLEND_MODE_DESTINATION_OUT");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_DESTINATION_ATOP, kCGBlendModeDestinationAtop, @"UI.iOS.BLEND_MODE_DESTINATION_ATOP", @"7.3.0", @"UI.BLEND_MODE_DESTINATION_ATOP");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_XOR, kCGBlendModeXOR, @"UI.iOS.BLEND_MODE_XOR", @"7.3.0", @"UI.BLEND_MODE_XOR");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_PLUS_DARKER, kCGBlendModePlusDarker, @"UI.iOS.BLEND_MODE_PLUS_DARKER", @"7.3.0", @"UI.BLEND_MODE_PLUS_DARKER");
-MAKE_SYSTEM_PROP_DEPRECATED_REPLACED(BLEND_MODE_PLUS_LIGHTER, kCGBlendModePlusLighter, @"UI.iOS.BLEND_MODE_PLUS_LIGHTER", @"7.3.0", @"UI.BLEND_MODE_PLUS_LIGHTER");
-
 MAKE_SYSTEM_STR(COLOR_GROUP_TABLEVIEW_BACKGROUND, IOS_COLOR_GROUP_TABLEVIEW_BACKGROUND);
 MAKE_SYSTEM_STR(TABLEVIEW_INDEX_SEARCH, UITableViewIndexSearch);
-
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_LINK_CLICKED, UIWebViewNavigationTypeLinkClicked);
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_FORM_SUBMITTED, UIWebViewNavigationTypeFormSubmitted);
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_BACK_FORWARD, UIWebViewNavigationTypeBackForward);
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_RELOAD, UIWebViewNavigationTypeReload);
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_FORM_RESUBMITTED, UIWebViewNavigationTypeFormResubmitted);
-MAKE_SYSTEM_PROP(WEBVIEW_NAVIGATIONTYPE_OTHER, UIWebViewNavigationTypeOther);
 
 #ifdef USE_TI_UIIOSAPPLICATIONSHORTCUTS
 - (id)createApplicationShortcuts:(id)args
 {
-  DEPRECATED_REPLACED(@"UI.iOS.ApplicationShortcuts", @"7.5.0", @"UI.ApplicationShortcuts");
+  DEPRECATED_REPLACED(@"UI.iOS.ApplicationShortcuts", @"9.1.0", @"UI.Shortcut");
   return [[[TiUIiOSApplicationShortcutsProxy alloc] _initWithPageContext:[self executionContext] args:args] autorelease];
 }
 #endif
 
-#if defined(USE_TI_UIIOSAPPLICATIONSHORTCUTS) || defined(USE_TI_UIAPPLICATIONSHORTCUTS)
+#if defined(USE_TI_UIIOSAPPLICATIONSHORTCUTS) || defined(USE_TI_UIAPPLICATIONSHORTCUTS) || defined(USE_TI_UISHORTCUT) || defined(USE_TI_UISHORTCUTITEM)
 MAKE_SYSTEM_PROP(SHORTCUT_ICON_TYPE_COMPOSE, UIApplicationShortcutIconTypeCompose);
 MAKE_SYSTEM_PROP(SHORTCUT_ICON_TYPE_PLAY, UIApplicationShortcutIconTypePlay);
 MAKE_SYSTEM_PROP(SHORTCUT_ICON_TYPE_PAUSE, UIApplicationShortcutIconTypePause);
@@ -789,11 +820,58 @@ MAKE_SYSTEM_PROP(FEEDBACK_GENERATOR_IMPACT_STYLE_MEDIUM, UIImpactFeedbackStyleMe
 MAKE_SYSTEM_PROP(FEEDBACK_GENERATOR_IMPACT_STYLE_HEAVY, UIImpactFeedbackStyleHeavy);
 #endif
 
-#if IS_XCODE_9
 MAKE_SYSTEM_PROP(LARGE_TITLE_DISPLAY_MODE_AUTOMATIC, UINavigationItemLargeTitleDisplayModeAutomatic);
 MAKE_SYSTEM_PROP(LARGE_TITLE_DISPLAY_MODE_ALWAYS, UINavigationItemLargeTitleDisplayModeAlways);
 MAKE_SYSTEM_PROP(LARGE_TITLE_DISPLAY_MODE_NEVER, UINavigationItemLargeTitleDisplayModeNever);
+
+#ifdef USE_TI_UIWEBVIEW
+
+- (id)createWebViewConfiguration:(id)args
+{
+  return [[[TiUIiOSWebViewConfigurationProxy alloc] _initWithPageContext:[self executionContext] args:args] autorelease];
+}
+
+- (id)createWebViewProcessPool:(id)args
+{
+  return [[[TiUIiOSWebViewProcessPoolProxy alloc] _initWithPageContext:[self executionContext] args:args] autorelease];
+}
+
+MAKE_SYSTEM_PROP(CREDENTIAL_PERSISTENCE_NONE, NSURLCredentialPersistenceNone);
+MAKE_SYSTEM_PROP(CREDENTIAL_PERSISTENCE_FOR_SESSION, NSURLCredentialPersistenceForSession);
+MAKE_SYSTEM_PROP(CREDENTIAL_PERSISTENCE_PERMANENT, NSURLCredentialPersistencePermanent);
+MAKE_SYSTEM_PROP(CREDENTIAL_PERSISTENCE_SYNCHRONIZABLE, NSURLCredentialPersistenceSynchronizable);
+
+MAKE_SYSTEM_PROP_UINTEGER(AUDIOVISUAL_MEDIA_TYPE_NONE, WKAudiovisualMediaTypeNone);
+MAKE_SYSTEM_PROP_UINTEGER(AUDIOVISUAL_MEDIA_TYPE_AUDIO, WKAudiovisualMediaTypeAudio);
+MAKE_SYSTEM_PROP_UINTEGER(AUDIOVISUAL_MEDIA_TYPE_VIDEO, WKAudiovisualMediaTypeVideo);
+MAKE_SYSTEM_PROP_UINTEGER(AUDIOVISUAL_MEDIA_TYPE_ALL, WKAudiovisualMediaTypeAll);
+
+MAKE_SYSTEM_PROP(CACHE_POLICY_USE_PROTOCOL_CACHE_POLICY, NSURLRequestUseProtocolCachePolicy)
+MAKE_SYSTEM_PROP(CACHE_POLICY_RELOAD_IGNORING_LOCAL_CACHE_DATA, NSURLRequestReloadIgnoringLocalCacheData)
+MAKE_SYSTEM_PROP(CACHE_POLICY_RETURN_CACHE_DATA_ELSE_LOAD, NSURLRequestReturnCacheDataElseLoad)
+MAKE_SYSTEM_PROP(CACHE_POLICY_RETURN_CACHE_DATA_DONT_LOAD, NSURLRequestReturnCacheDataDontLoad)
+
+MAKE_SYSTEM_PROP(SELECTION_GRANULARITY_DYNAMIC, WKSelectionGranularityDynamic);
+MAKE_SYSTEM_PROP(SELECTION_GRANULARITY_CHARACTER, WKSelectionGranularityCharacter);
+
+MAKE_SYSTEM_PROP(ACTION_POLICY_CANCEL, WKNavigationActionPolicyCancel);
+MAKE_SYSTEM_PROP(ACTION_POLICY_ALLOW, WKNavigationActionPolicyAllow);
+
+MAKE_SYSTEM_PROP(INJECTION_TIME_DOCUMENT_START, WKUserScriptInjectionTimeAtDocumentStart);
+MAKE_SYSTEM_PROP(INJECTION_TIME_DOCUMENT_END, WKUserScriptInjectionTimeAtDocumentEnd);
 #endif
+
+- (TiColor *)fetchSemanticColor:(id)color
+{
+  ENSURE_SINGLE_ARG(color, NSString);
+
+  DEPRECATED_REPLACED(@"UI.iOS.fetchSemanticColor", @"9.1.0", @"UI.fetchSemanticColor");
+
+  if ([TiUtils isIOSVersionOrGreater:@"11.0"]) {
+    return [[TiColor alloc] initWithColor:[UIColor colorNamed:color] name:nil];
+  }
+  return [[TiColor alloc] initWithColor:UIColor.blackColor name:@"black"];
+}
 
 @end
 #endif

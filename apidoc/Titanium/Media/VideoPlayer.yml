@@ -63,24 +63,26 @@ examples:
     example: |
         The following code creates a simple video player to play a local video file.
 
-            var vidWin = Titanium.UI.createWindow({
-                title : 'Video View Demo',
-                backgroundColor : '#fff'
-            });
+        ``` js
+        var vidWin = Titanium.UI.createWindow({
+            title : 'Video View Demo',
+            backgroundColor : '#fff'
+        });
 
-            var videoPlayer = Titanium.Media.createVideoPlayer({
-                top : 2,
-                autoplay : true,
-                backgroundColor : 'blue',
-                height : 300,
-                width : 300,
-                mediaControlStyle : Titanium.Media.VIDEO_CONTROL_DEFAULT,
-                scalingMode : Titanium.Media.VIDEO_SCALING_ASPECT_FIT
-            });
+        var videoPlayer = Titanium.Media.createVideoPlayer({
+            top : 2,
+            autoplay : true,
+            backgroundColor : 'blue',
+            height : 300,
+            width : 300,
+            mediaControlStyle : Titanium.Media.VIDEO_CONTROL_DEFAULT,
+            scalingMode : Titanium.Media.VIDEO_SCALING_ASPECT_FIT
+        });
 
-            videoPlayer.url = 'movie.mp4';
-            vidWin.add(videoPlayer);
-            vidWin.open();
+        videoPlayer.url = 'movie.mp4';
+        vidWin.add(videoPlayer);
+        vidWin.open();
+        ```
 
   - title: Android Fullscreen Video Player
     example: |
@@ -93,65 +95,68 @@ examples:
         can always dismiss the player by using the **Back** button, so an on-screen
         control would not be required.
 
-            Titanium.UI.setBackgroundColor('#000');
-            var win = Titanium.UI.createWindow({
-                title : 'Test',
-                backgroundColor : '#fff',
-                exitOnClose : true
+        ``` js
+        Titanium.UI.setBackgroundColor('#000');
+        var win = Titanium.UI.createWindow({
+            title : 'Test',
+            backgroundColor : '#fff',
+            exitOnClose : true
+        });
+
+        // Change to a valid URL
+        var contentURL = "http://www.example.com/stream.mp4";
+
+        var openButton = Ti.UI.createButton({
+            title : "Start Video",
+            top : "0dp",
+            height : "40dp",
+            left : "10dp",
+            right : "10dp"
+        });
+
+        openButton.addEventListener('click', function() {
+            var activeMovie = Titanium.Media.createVideoPlayer({
+                url : contentURL,
+                backgroundColor : 'blue',
+                mediaControlStyle : Titanium.Media.VIDEO_CONTROL_DEFAULT,
+                scalingMode : Titanium.Media.VIDEO_SCALING_ASPECT_FILL,
+                fullscreen : true,
+                autoplay : true
             });
 
-            // Change to a valid URL
-            var contentURL = "http://www.example.com/stream.mp4";
-
-            var openButton = Ti.UI.createButton({
-                title : "Start Video",
+            var closeButton = Ti.UI.createButton({
+                title : "Exit Video",
                 top : "0dp",
                 height : "40dp",
                 left : "10dp",
                 right : "10dp"
             });
 
-            openButton.addEventListener('click', function() {
-                var activeMovie = Titanium.Media.createVideoPlayer({
-                    url : contentURL,
-                    backgroundColor : 'blue',
-                    mediaControlStyle : Titanium.Media.VIDEO_CONTROL_DEFAULT,
-                    scalingMode : Titanium.Media.VIDEO_SCALING_ASPECT_FILL,
-                    fullscreen : true,
-                    autoplay : true
-                });
-
-                var closeButton = Ti.UI.createButton({
-                    title : "Exit Video",
-                    top : "0dp",
-                    height : "40dp",
-                    left : "10dp",
-                    right : "10dp"
-                });
-
-                closeButton.addEventListener('click', function() {
-                    activeMovie.hide();
-                    activeMovie.release();
-                    activeMovie = null;
-                });
-
-                activeMovie.add(closeButton);
+            closeButton.addEventListener('click', function() {
+                activeMovie.hide();
+                activeMovie.release();
+                activeMovie = null;
             });
-            win.add(openButton);
-            win.open();
+
+            activeMovie.add(closeButton);
+        });
+        win.add(openButton);
+        win.open();
+        ```
 
   - title: Alloy XML Markup
     example: |
         Previous simple example as an Alloy view.
 
-        simplevideoplayer.xml:
-
-            <Alloy>
-                <Window id="vidWin" title="Video View Demo" backgroundColor="#fff">
-                    <VideoPlayer id="videoPlayer" ns="Ti.Media" top="2" url="/movie.mp4"
-                                 height="300" width="300" backgroundColor="blue" autoplay="true" />
-                </Window>
-            </Alloy>
+        **simplevideoplayer.xml:**
+        ``` xml
+        <Alloy>
+            <Window id="vidWin" title="Video View Demo" backgroundColor="#fff">
+                <VideoPlayer id="videoPlayer" ns="Ti.Media" top="2" url="/movie.mp4"
+                              height="300" width="300" backgroundColor="blue" autoplay="true" />
+            </Window>
+        </Alloy>
+        ```
 
 methods:
 
@@ -207,14 +212,13 @@ methods:
   - name: thumbnailImageAtTime
     deprecated:
         since: '3.4.2'
-        notes: Use <Titanium.Media.VideoPlayer.requestThumbnailImagesAtTimes> instead.
+        notes: Use [Titanium.Media.VideoPlayer.requestThumbnailImagesAtTimes](Titanium.Media.VideoPlayer.requestThumbnailImagesAtTimes) instead.
         removed: '3.6.0'
     summary: Returns a thumbnail image for the video at the specified time.
     platforms: [iphone, ipad]
     returns:
         type: Titanium.Blob
     parameters:
-
       - name: time
         summary: Playback time, in **seconds**.
         type: Number
@@ -225,7 +229,6 @@ methods:
         constants: Titanium.Media.VIDEO_TIME_OPTION_*
 
 events:
-
   - name: complete
     summary: Fired when movie playback ends or a user exits playback.
     description: |
@@ -388,6 +391,7 @@ events:
     properties:
       - name: sourceType
         summary: New `sourceType` value.
+        type: Number
         constants: Titanium.Media.VIDEO_SOURCE_TYPE_*
     since: '3.0.0'
 
@@ -487,7 +491,7 @@ properties:
   - name: backgroundView
     deprecated:
         since: "7.0.0"
-        notes: Use <Titanium.Media.VideoPlayer.overlayView> instead.
+        notes: Use [Titanium.Media.VideoPlayer.overlayView](Titanium.Media.VideoPlayer.overlayView) instead.
     summary: Sets the background view for customization which is always displayed behind movie content.
     description: |
         To create a background behind the movie content on iOS, you can specify a
@@ -499,18 +503,20 @@ properties:
 
         The following code sample creates a video player with a background image:
 
-            var videoPlayer = Ti.Media.createVideoPlayer({
-                height : 300,
+        ``` js
+        var videoPlayer = Ti.Media.createVideoPlayer({
+            height : 300,
+            width : 300,
+            backgroundView : Ti.UI.createView({
+                backgroundImage: 'videoPlayerBG.png
                 width : 300,
-                backgroundView : Ti.UI.createView({
-                    backgroundImage: 'videoPlayerBG.png
-                    width : 300,
-                    height : 300
-                }),
-                borderRadius : 20,
-                borderWidth : 2,
-                borderColor : 'blue',
-            });
+                height : 300
+            }),
+            borderRadius : 20,
+            borderWidth : 2,
+            borderColor : 'blue',
+        });
+        ```
 
         Note that if [scalingMode](Titanium.Media.VideoPlayer.scalingMode) is set to
         [VIDEO_SCALING_MODE_FILL](Titanium.Media.VIDEO_SCALING_MODE_FILL) or
@@ -525,7 +531,7 @@ properties:
     deprecated:
         since: "1.4.0"
         removed: "3.0.0"
-        notes: Use <Titanium.Media.VideoPlayer.url> instead.
+        notes: Use [Titanium.Media.VideoPlayer.url](Titanium.Media.VideoPlayer.url) instead.
     type: String
 
   - name: currentPlaybackTime
@@ -567,7 +573,9 @@ properties:
 
         On Android, this property must be set at creation time. For example:
 
-            var player = Ti.Media.createVideoPlayer({fullscreen: true});
+        ``` js
+        var player = Ti.Media.createVideoPlayer({fullscreen: true});
+        ```
 
         On Android, setting this value to `true` means that the video will have its own Android Activity
         rather than being embedded as a view.
@@ -583,7 +591,7 @@ properties:
   - name: loadState
     deprecated:
         since: "7.0.0"
-        notes: On iOS, use <Titanium.Media.VideoPlayer.moviePlayerStatus> instead.
+        notes: On iOS, use [Titanium.Media.VideoPlayer.moviePlayerStatus](Titanium.Media.VideoPlayer.moviePlayerStatus) instead.
     summary: Returns the network load state of the movie player.
     type: Number
     permission: read-only
@@ -597,12 +605,12 @@ properties:
   - name: mediaControlStyle
     deprecated:
         since: "7.0.0"
-        notes: On iOS, use <Titanium.Media.VideoPlayer.showsControls> instead.
+        notes: On iOS, use [Titanium.Media.VideoPlayer.showsControls](Titanium.Media.VideoPlayer.showsControls) instead.
         removed: "7.0.0"
     summary: The style of the playback controls.
     description: |
-        Mobile web only supports <Titanium.Media.VIDEO_CONTROL_NONE> and
-        <Titanium.Media.VIDEO_CONTROL_DEFAULT>.
+        Mobile web only supports [VIDEO_CONTROL_NONE](Titanium.Media.VIDEO_CONTROL_NONE) and
+        [VIDEO_CONTROL_DEFAULT](Titanium.Media.VIDEO_CONTROL_DEFAULT).
     type: Number
     constants: Titanium.Media.VIDEO_CONTROL_*
     default: System default video controls (<Titanium.Media.VIDEO_CONTROL_DEFAULT>).
@@ -617,7 +625,9 @@ properties:
         A movie with both audio and video media is represented by a bitwise OR of the two
         constants:
 
-            Titanium.Media.VIDEO_MEDIA_TYPE_VIDEO|Titanium.Media.VIDEO_MEDIA_TYPE_AUDIO
+        ``` js
+        Titanium.Media.VIDEO_MEDIA_TYPE_VIDEO|Titanium.Media.VIDEO_MEDIA_TYPE_AUDIO
+        ```
     platforms: [iphone, ipad]
     type: Number
     constants: Titanium.Media.VIDEO_MEDIA_TYPE_*
@@ -646,18 +656,20 @@ properties:
 
         The following code sample creates a video player with a background image:
 
-            var videoPlayer = Ti.Media.createVideoPlayer({
-                height : 300,
+        ``` js
+        var videoPlayer = Ti.Media.createVideoPlayer({
+            height : 300,
+            width : 300,
+            overlayView : Ti.UI.createView({
+                backgroundImage: 'videoPlayerBG.png
                 width : 300,
-                overlayView : Ti.UI.createView({
-                    backgroundImage: 'videoPlayerBG.png
-                    width : 300,
-                    height : 300
-                }),
-                borderRadius : 20,
-                borderWidth : 2,
-                borderColor : 'blue',
-            });
+                height : 300
+            }),
+            borderRadius : 20,
+            borderWidth : 2,
+            borderColor : 'blue',
+        });
+        ```
     platforms: [iphone, ipad]
     type: Titanium.UI.View
 
@@ -676,7 +688,6 @@ properties:
         On Android, this is always the same as [duration](Titanium.Media.VideoPlayer.duration).
     type: Number
     permission: read-only
-
 
   - name: playbackState
     summary: Current playback state of the video player.

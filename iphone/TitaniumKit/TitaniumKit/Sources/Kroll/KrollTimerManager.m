@@ -1,11 +1,12 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2018 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2018-Present by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 
 #import "KrollTimerManager.h"
+#import "TiBindingTiValue.h"
 #import "TiExceptionHandler.h"
 #import "TiUtils.h"
 
@@ -17,7 +18,7 @@
 
 @implementation KrollTimerTarget
 
-- (instancetype)initWithCallback:(JSValue *)callback arguments:(NSArray<NSValue *> *)arguments
+- (instancetype)initWithCallback:(JSValue *)callback arguments:(NSArray<JSValue *> *)arguments
 {
   self = [super init];
   if (!self) {
@@ -45,6 +46,12 @@
 - (void)timerFired:(NSTimer *_Nonnull)timer
 {
   [self.callback callWithArguments:self.arguments];
+  // handle an uncaught exception
+  JSContext *context = self.callback.context;
+  JSValue *exception = context.exception;
+  if (exception != nil) {
+    [TiExceptionHandler.defaultExceptionHandler reportScriptError:exception inJSContext:context];
+  }
 }
 
 @end
@@ -58,7 +65,7 @@
     return nil;
   }
 
-  self.nextTimerIdentifier = 0;
+  self.nextTimerIdentifier = 1;
   self.timers = [NSMapTable strongToWeakObjectsMapTable];
 
   NSUInteger (^setInterval)(JSValue *, double) = ^(JSValue *callback, double interval) {
@@ -77,16 +84,6 @@
   context[@"clearInterval"] = clearInterval;
   context[@"clearTimeout"] = clearInterval;
 
-  // This is more useful than just in timers, should be registered in some better place like KrollBridge?
-  [context setExceptionHandler:^(JSContext *context, JSValue *exception) {
-    id exc;
-    if ([exception isObject]) {
-      exc = [exception toObject]; // Hope it becomes an NSDictionary?
-    } else {
-      exc = [exception toString];
-    }
-    [[TiExceptionHandler defaultExceptionHandler] reportScriptError:[TiUtils scriptErrorValue:exc]];
-  }];
   return self;
 }
 
@@ -126,7 +123,7 @@
     callbackArgs = [args subarrayWithRange:NSMakeRange(2, argCount - 2)];
   }
   NSNumber *timerIdentifier = @(self.nextTimerIdentifier++);
-  KrollTimerTarget *timerTarget = [[KrollTimerTarget alloc] initWithCallback:callback arguments:callbackArgs];
+  KrollTimerTarget *timerTarget = [[[KrollTimerTarget alloc] initWithCallback:callback arguments:callbackArgs] autorelease];
   NSTimer *timer = [NSTimer timerWithTimeInterval:interval target:timerTarget selector:@selector(timerFired:) userInfo:timerTarget repeats:shouldRepeat];
   [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 

@@ -22,43 +22,46 @@ description: |
     The following units are supported:
 
     <table class="doc-table" width="60%">
+      <thead>
         <tr>
-            <th>Unit</th>
-            <th>Specifier</th>
-            <th>Note</th>
+          <th>Unit</th>
+          <th>Specifier</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>pixels</td>
+          <td>px</td>
+          <td></td>
         </tr>
         <tr>
-            <td>pixels</td>
-            <td>px</td>
-            <td></td>
+          <td>density-independent pixels</td>
+          <td>dip</td>
+          <td>Equivalent to Apple "points."</td>
         </tr>
         <tr>
-            <td>density-independent pixels</td>
-            <td>dip</td>
-            <td>Equivalent to Apple "points."</td>
+          <td>inches</td>
+          <td>in</td>
+          <td></td>
         </tr>
         <tr>
-            <td>inches</td>
-            <td>in</td>
-            <td></td>
+          <td>millimeters</td>
+          <td>mm</td>
+          <td>Android, iOS only</td>
         </tr>
         <tr>
-            <td>millimeters</td>
-            <td>mm</td>
-            <td>Android, iOS only</td>
+          <td>centimeters</td>
+          <td>cm</td>
+          <td>Android, iOS only</td>
         </tr>
         <tr>
-            <td>centimeters</td>
-            <td>cm</td>
-            <td>Android, iOS only</td>
+          <td>points</td>
+          <td>pt</td>
+          <td>Typographical points of 1/72 of an inch. On Android, you can specify sizes and coordinates in typographical points. On other platforms, this unit is only used to specify font sizes. Not to be confused with Apple "points."</td>
         </tr>
-        <tr>
-            <td>points</td>
-            <td>pt</td>
-            <td>Typographical points of 1/72 of an inch. On Android, you can specify sizes and coordinates in typographical points. On other platforms, this unit is only used to specify font sizes. Not to be confused with Apple "points."</td>
-        </tr>
+      </tbody>
     </table>
-
 
     The interpretation of the density-independent pixel (DIP) varies by platform:
 
@@ -81,7 +84,9 @@ description: |
     `ti.ui.defaultunit` property in `tiapp.xml`. For example, to use DIPs as the
     default on all platforms, set `defaultunit` to `dip`:
 
-        <property name="ti.ui.defaultunit" type="string">dip</property>
+    ``` xml
+    <property name="ti.ui.defaultunit" type="string">dip</property>
+    ```
 
     The value for `ti.ui.defaultunit` can be any of the unit specifiers defined above, or
     `system` to specify that the platform's default unit should be used.
@@ -136,7 +141,7 @@ description: |
 
     #### Accessibility
 
-    Four accessibility-related view properties became available in Titanium Mobile 3.0.0 for iOS
+    Four accessibility-related view properties are available in Titanium Mobile for iOS
     and Android:
 
     * <Titanium.UI.View.accessibilityLabel>
@@ -182,7 +187,7 @@ description: |
 
     #### iOS Clipping Behavior
 
-    Four new view related properties became available in Titanium Mobile 3.3.0 for iOS.
+    Four view related properties are available in Titanium Mobile for iOS.
 
     * <Titanium.UI.View.viewShadowRadius>
     * <Titanium.UI.View.viewShadowColor>
@@ -203,8 +208,6 @@ description: |
     * If none of the conditions are met, clipping is disabled.
 
     In earlier versions of Titanium Mobile, views had clipping enabled by default.
-
-
 extends: Titanium.Proxy
 since: "0.9"
 
@@ -403,7 +406,7 @@ events:
 
       - name: inProgress
         summary: Returns `true` if a scale gesture is in progress, `false` otherwise.
-        type: Number
+        type: Boolean
         since: "7.5.0"
         platforms: [android]
 
@@ -479,6 +482,7 @@ events:
             Maximum possible value of the force property.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: altitudeAngle
         summary: |
@@ -486,25 +490,28 @@ events:
             being used, the value will be Pi/2. If the stylus is parallel to the screen, the value will be 0.
             Note: This property is only available for iOS devices that support 3D-Touch and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: timestamp
         summary: |
             The time (in seconds) when the touch was used in correlation with the system start up.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewX
         summary: |
             The x value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewY
         summary: |
             The y value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
-
+        platforms: [iphone, ipad]
 
   - name: touchend
     summary: Fired when a touch event is completed.
@@ -536,6 +543,7 @@ events:
             Maximum possible value of the force property.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: altitudeAngle
         summary: |
@@ -543,24 +551,28 @@ events:
             being used, the value will be Pi/2. If the stylus is parallel to the screen, the value will be 0.
             Note: This property is only available for iOS devices that support 3D-Touch and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: timestamp
         summary: |
             The time (in seconds) when the touch was used in correlation with the system start up.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewX
         summary: |
             The x value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewY
         summary: |
             The y value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Penciland are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
   - name: touchmove
     summary: Fired as soon as the device detects movement of a touch.
@@ -591,6 +603,7 @@ events:
             Maximum possible value of the force property.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: altitudeAngle
         summary: |
@@ -598,24 +611,28 @@ events:
             being used, the value will be Pi/2. If the stylus is parallel to the screen, the value will be 0.
             Note: This property is only available for iOS devices that support 3D-Touch and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: timestamp
         summary: |
             The time (in seconds) when the touch was used in correlation with the system start up.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewX
         summary: |
             The x value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewY
         summary: |
             The y value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
   - name: touchstart
     summary: Fired as soon as the device detects a touch gesture.
@@ -644,6 +661,7 @@ events:
             Maximum possible value of the force property.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: altitudeAngle
         summary: |
@@ -651,24 +669,28 @@ events:
             being used, the value will be Pi/2. If the stylus is parallel to the screen, the value will be 0.
             Note: This property is only available for iOS devices that support 3D-Touch and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: timestamp
         summary: |
             The time (in seconds) when the touch was used in correlation with the system start up.
             Note: This property is only available for iOS devices that support 3D-Touch and run 9.0 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewX
         summary: |
             The x value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
       - name: azimuthUnitVectorInViewY
         summary: |
             The y value of the unit vector that points in the direction of the azimuth of the stylus.
             Note: This property is only available for iOS devices that support the Apple Pencil and are 9.1 or later.
         type: Number
+        platforms: [iphone, ipad]
 
   - name: twofingertap
     summary: Fired when the device detects a two-finger tap against the view.
@@ -791,13 +813,14 @@ methods:
         The [Animation](Titanium.UI.Animation) object or dictionary passed to this method defines
         the end state for the animation, the duration of the animation, and other properties.
 
-        Note that if you use `animate` to move a view, the view's actual *position* is changed, but
+        Note that on SDKs older than 9.1.0 - if you use `animate` to move a view, the view's actual *position* is changed, but
         its layout properties, such as `top`, `left`, `center` and so on are not changed--these
         reflect the original values set by the user, not the actual position of the view.
 
+        As of SDK 9.1.0, the final values of the animation will be set on the view just before the `complete` event and/or the callback is fired.
+
         The [rect](Titanium.UI.View.rect) property can be used to determine the actual size and
         position of the view.
-
     parameters:
       - name: animation
         summary: |
@@ -807,14 +830,21 @@ methods:
 
       - name: callback
         summary: Function to be invoked upon completion of the animation.
-        type: Callback<Object>
+        type: Callback<Object> # FIXME: iOS appears to fire with the Ti.UI.Animation object, while Android fires with an empty object
         optional: true
+
+  - name: clearMotionEffects
+    summary: Removes all previously added motion effects.
+    description: Use this method together with <Titanium.UI.horizontalMotionEffect> and <Titanium.UI.verticalMotionEffect>.
+    since: "8.2.0"
+    platforms: [iphone, ipad]
 
   - name: finishLayout
     since: "2.0.0"
     deprecated:
         since: "3.0.0"
-        notes: Use the <Titanium.Proxy.applyProperties> method to batch-update layout properties.
+        removed: "9.0.0"
+        notes: Use the [applyProperties](Titanium.Proxy.applyProperties) method to batch-update layout properties.
     summary: |
         Finishes a batch update of the View's layout properties and schedules a layout pass of the
         view tree.
@@ -831,9 +861,14 @@ methods:
     parameters:
       - name: options
         summary: |
-            Animation options for Android. **Since Release 5.1.0.**
-        type: AnimationOption
+            Animation options for Android only. **Since SDK 5.1.0 and used only on Android 5.0+**
+
+            Determines whether to enable a circular reveal animation.
+            Note that the default here is equivalent to passing in `{ animated: false }`
+        type: AnimatedOptions
         optional: true
+        default: "{ animated: false }"
+        # FIXME: Allow setting platforms/osver on parameters. Sucks we have to stick this in summary!
 
   - name: insertAt
     summary: Inserts a view at the specified position in the [children](Titanium.UI.View.children) array.
@@ -842,12 +877,8 @@ methods:
     parameters:
       - name: params
         summary: |
-            Pass an object with the following key-value pairs:
-
-             * `view` (Titanium.UI.View): View to insert
-             * `position` (Number): Position in the [children](Titanium.UI.View.children) array to
-               insert the view. If omitted, inserts the view to the end of the array.
-        type: Dictionary
+            Pass an object that specifies the view to insert and optionally at which position (defaults to end)
+        type: ViewPositionOptions
     since: 3.3.0
     platforms: [android, iphone, ipad]
 
@@ -869,12 +900,8 @@ methods:
     parameters:
       - name: params
         summary: |
-            Pass an object with the following key-value pairs:
-
-             * `view` (Titanium.UI.View): View to insert
-             * `position` (Number): Position in the [children](Titanium.UI.View.children) array of
-               the view elment to replace.
-        type: Dictionary
+            Pass an object with the view to insert and the position of the view to replace. In this case the `position` property is required.
+        type: ViewPositionOptions
     since: 3.3.0
     platforms: [android, iphone, ipad]
 
@@ -883,9 +910,14 @@ methods:
     parameters:
       - name: options
         summary: |
-            Animation options for Android. **Since Release 5.1.0.**
-        type: AnimationOption
+            Animation options for Android only. **Since SDK 5.1.0 and only used on Android 5.0+**
+
+            Determines whether to enable a circular reveal animation.
+            Note that the default here is equivalent to passing in `{ animated: false }`
+        type: AnimatedOptions
         optional: true
+        default: "{ animated: false }"
+        # FIXME: Support platfroms/osver/since on parameters!
 
   - name: startLayout
     summary: Starts a batch update of this view's layout properties.
@@ -897,10 +929,12 @@ methods:
         Call [finishLayout](Titanium.UI.View.finishLayout) to end batch update mode and trigger a
         layout pass. For example:
 
-            view.startLayout();
-            view.top = 50;
-            view.left = 50;
-            view.finishLayout();
+        ``` js
+        view.startLayout();
+        view.top = 50;
+        view.left = 50;
+        view.finishLayout();
+        ```
 
         Note that _any_ property changes made during the batch update _may_ be deferred until
         `finishLayout` is called. This may vary somewhat by platform. For example, changing the
@@ -913,12 +947,13 @@ methods:
     since: "2.0.0"
     deprecated:
         since: "3.0.0"
-        notes: Use the <Titanium.Proxy.applyProperties> method to batch-update layout properties.
+        removed: "9.0.0"
+        notes: Use the [Titanium.Proxy.applyProperties](Titanium.Proxy.applyProperties) method to batch-update layout properties.
 
   - name: toImage
     summary: Returns an image of the rendered view, as a Blob.
     description: |
-        The `honorScaleFactor` method is only supported on iOS.
+        The `honorScaleFactor` argument is only supported on iOS.
     returns:
         type: Titanium.Blob
     platforms: [android, iphone, ipad]
@@ -948,14 +983,18 @@ methods:
         This is another way to perform a batch update.  The `updateLayout` method is called with a
         dictionary of layout properties to perform the batch update. For example:
 
-            view.updateLayout({top:50, left:50});
+        ``` js
+        view.updateLayout({top:50, left:50});
+        ```
 
         This is equivalent to the following:
 
-            view.startLayout();
-            view.top = 50;
-            view.left = 50;
-            view.finishLayout();
+        ``` js
+        view.startLayout();
+        view.top = 50;
+        view.left = 50;
+        view.finishLayout();
+        ```
 
         See also: [startLayout](Titanium.UI.View.startLayout),
         [finishLayout](Titanium.UI.View.finishLayout),
@@ -963,7 +1002,8 @@ methods:
     since: "2.0.0"
     deprecated:
         since: "3.0.0"
-        notes: Use the <Titanium.Proxy.applyProperties> method to batch-update layout properties.
+        removed: "9.0.0"
+        notes: Use the [Titanium.Proxy.applyProperties](Titanium.Proxy.applyProperties) method to batch-update layout properties.
     parameters:
       - name: params
         summary: Layout properties to be updated.
@@ -1025,7 +1065,6 @@ properties:
         [View.setImportantForAccessibility](https://developer.android.com/reference/android/view/View.html#setImportantForAccessibility%28int%29)
         method. The native method is only available in Android 4.1 (API level 16/Jelly Bean) and
         later; if this property is specified on earlier versions of Android, it is ignored.
-
     since: "3.0.0"
     platforms: [android, iphone, ipad]
     type: Boolean
@@ -1103,7 +1142,7 @@ properties:
     summary: Background color of the view, as a color name or hex triplet.
     description: |
         For information about color values, see the "Colors" section of <Titanium.UI>. Defaults to `Transparent`.
-    type: String
+    type: [ String, Titanium.UI.Color ]
 
   - name: backgroundDisabledColor
     summary: Disabled background color of the view, as a color name or hex triplet.
@@ -1151,20 +1190,26 @@ properties:
         A radial gradient is interpolated between two circles, defined by `startPoint` and
         `startRadius` and `endPoint` and `endRadius` respectively.
 
-        The start and end points and radius values can be defined in device units, in the view's
+        The start points, end points and radius values can be defined in device units, in the view's
         coordinates, or as percentages of the view's size. Thus, if a view is 60 x 60, the center
         point of the view can be specified as:
 
-            { x: 30, y: 30 }
-        Or:
+        ``` js
+        { x: 30, y: 30 }
+        ```
 
-            { x: '50%', y: '50%' }
+        Or:
+        ``` js
+        { x: '50%', y: '50%' }
+        ```
 
         When specifying multiple colors, you can specify an *offset* value for each color, defining
         how far into the gradient it takes effect. For example, the following color array specifies
         a gradient that goes from red to blue back to red:
 
-            colors: [ { color: 'red', offset: 0.0}, { color: 'blue', offset: 0.25 }, { color: 'red', offset: 1.0 } ]
+        ``` js
+        colors: [ { color: 'red', offset: 0.0}, { color: 'blue', offset: 0.25 }, { color: 'red', offset: 1.0 } ]
+        ```
 
         Android's linear gradients ignores `backfillStart` and `backfillEnd`, treating them as if
         they are true. Android's radial gradients ignore the `endPoint` property.
@@ -1175,40 +1220,42 @@ properties:
             The following code excerpt creates two views, one with a linear gradient and one with
             a radial gradient.
 
-                var win1 = Titanium.UI.createWindow({
-                    title:'Tab 1',
-                    backgroundColor:'#fff',
-                    layout: 'vertical'
-                });
+            ``` js
+            var win1 = Titanium.UI.createWindow({
+                title:'Tab 1',
+                backgroundColor:'#fff',
+                layout: 'vertical'
+            });
 
-                var radialGradient = Ti.UI.createView({
-                    top: 10,
-                    width: 100,
-                    height: 100,
-                    backgroundGradient: {
-                        type: 'radial',
-                        startPoint: { x: 50, y: 50 },
-                        endPoint: { x: 50, y: 50 },
-                        colors: [ 'red', 'blue'],
-                        startRadius: 50,
-                        endRadius: 0,
-                        backfillStart: true
-                    }
-                });
-                var linearGradient = Ti.UI.createView({
-                    top: 10,
-                    width: 100,
-                    height: 100,
-                    backgroundGradient: {
-                        type: 'linear',
-                        startPoint: { x: '0%', y: '50%' },
-                        endPoint: { x: '100%', y: '50%' },
-                        colors: [ { color: 'red', offset: 0.0}, { color: 'blue', offset: 0.25 }, { color: 'red', offset: 1.0 } ],
-                    }
-                });
-                win1.add(radialGradient);
-                win1.add(linearGradient);
-                win1.open();
+            var radialGradient = Ti.UI.createView({
+                top: 10,
+                width: 100,
+                height: 100,
+                backgroundGradient: {
+                    type: 'radial',
+                    startPoint: { x: 50, y: 50 },
+                    endPoint: { x: 50, y: 50 },
+                    colors: [ 'red', 'blue'],
+                    startRadius: 50,
+                    endRadius: 0,
+                    backfillStart: true
+                }
+            });
+            var linearGradient = Ti.UI.createView({
+                top: 10,
+                width: 100,
+                height: 100,
+                backgroundGradient: {
+                    type: 'linear',
+                    startPoint: { x: '0%', y: '50%' },
+                    endPoint: { x: '100%', y: '50%' },
+                    colors: [ { color: 'red', offset: 0.0}, { color: 'blue', offset: 0.25 }, { color: 'red', offset: 1.0 } ],
+                }
+            });
+            win1.add(radialGradient);
+            win1.add(linearGradient);
+            win1.open();
+            ```
 
   - name: backgroundImage
     summary: Background image for the view, specified as a local file path or URL.
@@ -1280,13 +1327,16 @@ properties:
         For information about color values, see the "Colors" section of <Titanium.UI>.
 
         Defaults to the normal background color of this view (Android), black (iOS).
-    type: String
+    type: [String, Titanium.UI.Color]
 
   - name: borderRadius
     summary: Radius for the rounded corners of the view's border.
     description: Each corner is rounded using an arc of a circle.
-    type: Number
+        Values for each corner can be specified. For example, '20px 20px' will set both left and right corners to `20px`.
+        Specifying '20px 20px 20px 20px' will set top-left, top-right, bottom-right and bottom-left corners in that order.
+    type: [Number, String, Array<Number>, Array<String>]
     default: 0
+    osver: {android: {min: "5.0"}}
 
   - name: borderWidth
     summary: Border width of the view.
@@ -1317,7 +1367,6 @@ properties:
 
         Defaults to `undefined`.
     type: Point
-
 
   - name: children
     summary: Array of this view's child views.
@@ -1394,20 +1443,25 @@ properties:
     type: Number
     constants: [Titanium.UI.HIDDEN_BEHAVIOR_INVISIBLE, Titanium.UI.HIDDEN_BEHAVIOR_GONE]
     platforms: [android]
-    since: 6.1.0
+    since: "6.1.0"
 
   - name: horizontalMotionEffect
     summary: Adds a horizontal parallax effect to the view
     description: |
-        Pass an object with the following key-value pairs:
-
-         * `min` (Number): Minimum amount it can move horizontally (-10 for example)
-         * `max` (Number): Maximum amount it can move horizontally (10 for example)
-
-         Note that the parallax effect only happens by tilting the device so results can not be seen on Simulator
-    type: Dictionary
+        Note that the parallax effect only happens by tilting the device so results can not be seen on Simulator.
+        To clear all motion effects, use the <Titanium.UI.clearMotionEffects> method.
+    type: MinMaxOptions
     platforms: [iphone, ipad]
-    since: 7.3.0
+    since: "7.3.0"
+
+  - name: id
+    summary: View's identifier.
+    description: |
+        The `id` property of the Ti.UI.View represents the view's identifier. The identifier string does
+        not have to be unique. You can use this property with <Titanium.UI.View.getViewById> method.
+    type: String
+    accessors: false
+    optional: true
 
   - name: left
     summary: View's left position, in platform-specific units.
@@ -1448,55 +1502,73 @@ properties:
             (For example, if `height`, `center.y` and `bottom` are all specified, the
             `height` and `center.y` values take precedence.)
 
-            <table cellpadding="6px" border="1" rules="all">
-            <tr>
-            <th>Scenario</th><th>Behavior</th>
-            </tr>
-            <tr>
-            <td><code>height</code> & <code>top</code> specified</td><td>Child positioned <code>top</code> unit from
-            parent's top, using specified <code>height</code>;
-            any <code>center.y</code> and <code>bottom</code> values are ignored.</td>
-            </tr>
-            <tr>
-            <td><code>height</code> & <code>center.y</code> specified</td><td>Child positioned with center at
-            <code>center.y</code>, using specified <code>height</code>; any <code>bottom</code> value is ignored.</td>
-            </tr>
-            <tr>
-            <td><code>height</code> & <code>bottom</code> specified</td><td>Child positioned <code>bottom</code> units from
-            parent's bottom, using specified <code>height</code>.</td>
-            </tr>
-            <tr>
-            <td><code>top</code> & <code>center.y</code> specified</td><td>Child positioned with top edge <code>top</code> units from
-            parent's top and center at <code>center.y</code>. Height is determined implicitly;
-            any <code>bottom</code> value is ignored.</td>
-            </tr>
-            <tr>
-            <td><code>top</code> & <code>bottom</code> specified</td><td>Child positioned with top edge <code>top</code> units from
-            parent's top and bottom edge <code>bottom</code> units from parent's bottom. Height is determined
-            implicitly. </td>
-            </tr>
-            <tr>
-            <td>Only <code>top</code> specified</td><td>Child positioned <code>top</code> units from parent's
-            top, and uses the default height calculation for the view type.</td>
-            </tr>
-            <tr>
-            <td><code>center.y</code> and <code>bottom</code> specified</td><td>Child positioned with center at
-            <code>center.y</code> and bottom edge <code>bottom</code> units from parent's bottom. Height is determined
-            implicitly.</td>
-            </tr>
-            <tr>
-            <td>Only <code>center.y</code> specified</td><td>Child positioned with center at
-            <code>center.y</code>, and uses the default height calculation for the view type.</td>
-            </tr>
-            <tr>
-            <td>Only <code>bottom</code> specified</td><td>Child positioned with bottom edge <code>bottom</code>
-            units from parent's bottom, and uses the default height calculation for the view type.</td>
-            </tr>
-            <tr>
-            <td><code>height</code>, <code>top</code>, <code>center.y</code>, and <code>bottom</code> unspecified</td><td>Child
-            centered vertically in the parent and uses the default height calculation
-            for the child view type.</td>
-            </tr>
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>height</code> & <code>top</code> specified</td>
+                  <td>
+                    Child positioned <code>top</code> unit from parent's top, using specified <code>height</code>;
+                    any <code>center.y</code> and <code>bottom</code> values are ignored.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>height</code> & <code>center.y</code> specified</td>
+                  <td>
+                    Child positioned with center at <code>center.y</code>, using specified <code>height</code>;
+                    any <code>bottom</code> value is ignored.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>height</code> & <code>bottom</code> specified</td>
+                  <td>Child positioned <code>bottom</code> units from parent's bottom, using specified <code>height</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>top</code> & <code>center.y</code> specified</td>
+                  <td>
+                    Child positioned with top edge <code>top</code> units from parent's top and center at
+                    <code>center.y</code>. Height is determined implicitly; any <code>bottom</code> value is ignored.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>top</code> & <code>bottom</code> specified</td>
+                  <td>
+                    Child positioned with top edge <code>top</code> units from parent's top and bottom edge
+                    <code>bottom</code> units from parent's bottom. Height is determined implicitly.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Only <code>top</code> specified</td>
+                  <td>
+                    Child positioned <code>top</code> units from parent's top, and uses the default height
+                    calculation for the view type.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>center.y</code> and <code>bottom</code> specified</td>
+                  <td>
+                    Child positioned with center at <code>center.y</code> and bottom edge <code>bottom</code>
+                    units from parent's bottom. Height is determined implicitly.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Only <code>center.y</code> specified</td>
+                  <td>Child positioned with center at <code>center.y</code>, and uses the default height calculation for the view type.</td>
+                </tr>
+                <tr>
+                  <td>Only <code>bottom</code> specified</td>
+                  <td>Child positioned with bottom edge <code>bottom</code> units from parent's bottom, and uses the default height calculation for the view type.</td>
+                </tr>
+                <tr>
+                  <td><code>height</code>, <code>top</code>, <code>center.y</code>, and <code>bottom</code> unspecified</td>
+                  <td>Child entered vertically in the parent and uses the default height calculation for the child view type.</td>
+                </tr>
+              </tbody>
             </table>
 
             Horizontal positioning works like vertical positioning, except that the
@@ -1521,11 +1593,10 @@ properties:
             it is wrapped to a new row. The height of each row is equal to the maximum height of
             the children in that row.
 
-            Wrapping behavior is available on iOS and Android (Release 2.1.0 and later).
-            When the `horizontalWrap` property is set to true, the first row is placed at the top of the
-            parent view, and successive rows are placed below the first row. Each child is
-            positioned vertically _within its row_ somewhat like composite layout mode.
-            In particular:
+            Wrapping behavior is available on iOS and Android. When the `horizontalWrap` property is
+            set to true, the first row is placed at the top of the parent view, and successive rows
+            are placed below the first row. Each child is positioned vertically _within its row_ somewhat
+            like composite layout mode. In particular:
 
             *   If neither `top` or `bottom` is specified, the child is centered in the
                 row.
@@ -1538,9 +1609,6 @@ properties:
             Children are laid or horizontally from left to right in a single row. The `left` and
             `right` properties are used as padding between the children, and the `top` and `bottom`
             properties are used to position the children vertically.
-
-            On Android and iOS _prior to_ Release
-            2.1.0, the horizontal layout always wraps and the `horizontalWrap` property is not supported.
 
             Defaults to Composite layout.
 
@@ -1564,7 +1632,7 @@ properties:
       Background color of the wrapper view when this view is used as either <Titanium.UI.ListView.pullView> or <Titanium.UI.TableView.headerPullView>.
 
       Defaults to `undefined`. Results in a light grey background color on the wrapper view.
-    type: String
+    type: [String, Titanium.UI.Color]
     since: "3.3.0"
     platforms: [iphone,ipad]
 
@@ -1609,7 +1677,7 @@ properties:
         The correct values will only be available when layout is complete.
         To determine when layout is complete, add a listener for the
         [postlayout](Titanium.UI.View.postlayout) event.
-    type: Dimension
+    type: DimensionWithAbsolutes
     permission: read-only
     since: "2.0.0"
 
@@ -1664,7 +1732,6 @@ properties:
     type: Dimension
     permission: read-only
 
-
   - name: softKeyboardOnFocus
     summary: Determines keyboard behavior when this view is focused. Defaults to <Titanium.UI.Android.SOFT_KEYBOARD_DEFAULT_ON_FOCUS>.
     type: Number
@@ -1676,7 +1743,7 @@ properties:
     description: |
         This property is a direct correspondant of the tintColor property of UIView on iOS. If no value is specified,
         the tintColor of the View is inherited from its superview.
-    type: [String]
+    type: [String, Titanium.UI.Color]
     since: "3.1.3"
     default: null
     osver: {ios: {min: "7.0"}}
@@ -1702,8 +1769,11 @@ properties:
   - name: touchFeedback
     summary: A material design visual construct that provides an instantaneous visual confirmation of touch point.
     description: |
-        This is an opt-in feature available from Android Lollipop.
-        Touch feedback is applied only if the backgroundColor is a solid color.
+        Touch feedback is only applied to a view's background. It is never applied to the view's foreground content
+        such as a <Titanium.UI.ImageView>'s image.
+
+        For Titanium versions older than 9.1.0, touch feedback only works if you set the
+        <Titanium.UI.View.backgroundColor> property to a non-transparent color.
     type: Boolean
     default: false
     platforms: [android]
@@ -1720,8 +1790,9 @@ properties:
 
   - name: transform
     summary: Transformation matrix to apply to the view.
-    description: Android only supports 2DMatrix transforms. Defaults to identity matrix.
-    type: [ Titanium.UI.2DMatrix, Titanium.UI.3DMatrix ]
+    description: Android only supports Matrix2D transforms.
+    type: [ Titanium.UI.Matrix2D, Titanium.UI.Matrix3D ]
+    default: Identity matrix
 
   - name: translationX
     summary: Horizontal location of the view relative to its left position in pixels.
@@ -1756,13 +1827,9 @@ properties:
   - name: verticalMotionEffect
     summary: Adds a vertical parallax effect to the view
     description: |
-        Pass an object with the following key-value pairs:
-
-         * `min` (Number): Minimum amount it can move vertically (-10 for example)
-         * `max` (Number): Maximum amount it can move vertically (10 for example)
-
-         Note that the parallax effect only happens by tilting the device so results can not be seen on Simulator
-    type: Dictionary
+        Note that the parallax effect only happens by tilting the device so results can not be seen on Simulator.
+        To clear all motion effects, use the <Titanium.UI.clearMotionEffects> method.
+    type: MinMaxOptions
     platforms: [iphone, ipad]
     since: 7.3.0
 
@@ -1776,7 +1843,7 @@ properties:
   - name: viewShadowColor
     summary: Determines the color of the shadow.
     description: Defaults to `undefined`. Behaves as if transparent.
-    type: String
+    type: [String, Titanium.UI.Color]
     platforms: [iphone,ipad]
     since: "3.3.0"
 
@@ -1823,7 +1890,6 @@ properties:
     default: true
     since: "2.1.0"
 
-
   - name: zIndex
     summary: Z-index stack order position, relative to other sibling views.
     description: |
@@ -1848,21 +1914,25 @@ examples:
     example: |
         Create a rounded view.
 
-            var view = Titanium.UI.createView({
-               borderRadius:10,
-               backgroundColor:'red',
-               width:50,
-               height:50
-            });
-            window.add(view);
+        ``` js
+        var view = Titanium.UI.createView({
+            borderRadius:10,
+            backgroundColor:'red',
+            width:50,
+            height:50
+        });
+        window.add(view);
+        ```
 
   - title: Alloy XML Markup
     example: |
         Previous example as an Alloy view.
 
-            <Alloy>
-                <View id="view" borderRadius="10" backgroundColor="red" width="50" height="50" />
-            </Alloy>
+        ``` xml
+        <Alloy>
+            <View id="view" borderRadius="10" backgroundColor="red" width="50" height="50" />
+        </Alloy>
+        ```
 
 ---
 name: Point
@@ -1942,7 +2012,7 @@ properties:
         Color value at this point in the gradient, as a color name or hex triplet.
     description: |
         For information about color values, see the "Colors" section of <Titanium.UI>.
-    type: String
+    type: [String, Titanium.UI.Color]
 
   - name: offset
     summary: The color's normalized position within the gradient, ranging from 0 (start) to 1 (end).
@@ -1955,60 +2025,32 @@ properties:
     type: Number
 
 ---
-name: Dimension
-summary: A simple object consisting of the position and size measurements.
-since: "2.0.0"
-description: |
-  When a dimension is returned by the [rect](Titanium.UI.View.rect) property, `x` represents the
-  view's left position, and `y` represents the view's top position.
-
-  The [size](Titanium.UI.View.size) property returns a dimension object with `x` and `y` both set
-  to 0.
+name: MinMaxOptions
+summary: An object for setting `min`/`max` value pairs.
 properties:
-  - name: height
-    summary: The height measurement.
+  - name: min
     type: Number
+    summary: Minimum value
 
-  - name: width
-    summary: The width measurement.
+  - name: max
     type: Number
-
-  - name: x
-    summary: The x-axis coordinate of the position.
-    type: Number
-
-  - name: y
-    summary: The y-axis coordinate of the position.
-    type: Number
+    summary: Maximum value
 
 ---
-name: AnimationOption
-summary: Optional parameter to enable animation to [hide](Titanium.UI.View.hide) and [show](Titanium.UI.View.show).
-since: "5.1.0"
-platforms: [android]
+name: ViewPositionOptions
+summary: |
+    Pass an object with the following key-value pairs:
+
+      * `view` (Titanium.UI.View): View to insert
+      * `position` (Number): Position in the [children](Titanium.UI.View.children) array of
+        the view elment to replace.
 properties:
-  - name: animated
-    summary: Determines whether to enable a circular reveal animation.
-    type: Boolean
-    default: false
-    osver: {android: {min: 5.0}}
+  - name: view
+    type: Titanium.UI.View
+    summary: View to insert. Required.
+    optional: false
 
----
-name: ViewPadding
-summary: Dictionary object of parameters for the padding applied to all kinds of views.
-properties:
-  - name: left
+  - name: position
     type: Number
-    summary: Left padding
-
-  - name: right
-    type: Number
-    summary: Right padding
-
-  - name: top
-    type: Number
-    summary: Top padding
-
-  - name: bottom
-    type: Number
-    summary: Bottom padding
+    summary: Position in the [children](Titanium.UI.View.children) array of the view element to replace.
+    optional: true

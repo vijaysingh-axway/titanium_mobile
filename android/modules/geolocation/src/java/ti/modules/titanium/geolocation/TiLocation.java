@@ -23,7 +23,6 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiMessenger;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiC;
-import org.appcelerator.titanium.util.TiPlatformHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +56,7 @@ public class TiLocation implements Handler.Callback
 	private Handler runtimeHandler;
 
 	public interface GeocodeResponseHandler {
-		public abstract void handleGeocodeResponse(KrollDict geocodeResponse);
+		void handleGeocodeResponse(KrollDict geocodeResponse);
 	}
 
 	public TiLocation()
@@ -330,12 +329,9 @@ public class TiLocation implements Handler.Callback
 		address.put(TiC.PROPERTY_POSTAL_CODE, place.optString("zipcode", ""));
 		address.put(TiC.PROPERTY_COUNTRY, place.optString(TiC.PROPERTY_COUNTRY, ""));
 		address.put(TiC.PROPERTY_STATE, place.optString(TiC.PROPERTY_STATE, ""));
-		address.put("countryCode", place.optString(TiC.PROPERTY_COUNTRY_CODE,
-												   "")); // TIMOB-4478, remove this later, was old android name
-		address.put(TiC.PROPERTY_COUNTRY_CODE, place.optString(TiC.PROPERTY_COUNTRY_CODE, ""));
-		address.put(TiC.PROPERTY_LONGITUDE, place.optString(TiC.PROPERTY_LONGITUDE, ""));
-		address.put(TiC.PROPERTY_LATITUDE, place.optString(TiC.PROPERTY_LATITUDE, ""));
-		address.put(TiC.PROPERTY_DISPLAY_ADDRESS, place.optString(TiC.PROPERTY_ADDRESS));
+		address.put(TiC.PROPERTY_COUNTRY_CODE, place.optString("country_code", ""));
+		address.put(TiC.PROPERTY_LONGITUDE, place.optDouble(TiC.PROPERTY_LONGITUDE, 0.0d));
+		address.put(TiC.PROPERTY_LATITUDE, place.optDouble(TiC.PROPERTY_LATITUDE, 0.0d));
 		address.put(TiC.PROPERTY_ADDRESS, place.optString(TiC.PROPERTY_ADDRESS));
 
 		return address;

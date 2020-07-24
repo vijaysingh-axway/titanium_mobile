@@ -126,9 +126,10 @@
   }
 
   [[[TiApp app] controller] dismissKeyboard];
-  TiThreadPerformOnMainThread(^{
-    [self pushOnUIThread:args];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self pushOnUIThread:args];
+      },
       YES);
 }
 
@@ -140,9 +141,10 @@
     DebugLog(@"[ERROR] Can not close the root window of the NavigationWindow. Close the NavigationWindow instead.");
     return;
   }
-  TiThreadPerformOnMainThread(^{
-    [self popOnUIThread:args];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self popOnUIThread:args];
+      },
       YES);
 }
 
@@ -150,9 +152,10 @@
 {
   ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
 
-  TiThreadPerformOnMainThread(^{
-    [navController popToRootViewControllerAnimated:[TiUtils boolValue:@"animated" properties:args def:NO]];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [navController popToRootViewControllerAnimated:[TiUtils boolValue:@"animated" properties:args def:NO]];
+      },
       YES);
 }
 
@@ -213,12 +216,13 @@
     }
   }
   TiWindowProxy *theWindow = (TiWindowProxy *)[(TiViewController *)viewController proxy];
-#if IS_XCODE_9
   [theWindow processForSafeArea];
-#endif
   if ((theWindow != rootWindow) && [theWindow opening]) {
     [theWindow windowWillOpen];
     [theWindow windowDidOpen];
+  }
+  if ([TiUtils isIOSVersionOrGreater:@"13.0"]) {
+    navController.view.backgroundColor = theWindow.view.backgroundColor;
   }
 }
 
@@ -269,14 +273,28 @@
 
 - (void)pushOnUIThread:(NSArray *)args
 {
-  if (transitionIsAnimating || transitionWithGesture) {
+  if (transitionIsAnimating || transitionWithGesture || !navController) {
     [self performSelector:_cmd withObject:args afterDelay:0.1];
     return;
   }
-  TiWindowProxy *window = [args objectAtIndex:0];
-  BOOL animated = args != nil && [args count] > 1 ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:1] def:YES] : YES;
+  if (!transitionWithGesture) {
+    transitionIsAnimating = YES;
+  }
 
-  [navController pushViewController:[window hostingController] animated:animated];
+  @try {
+    TiWindowProxy *window = [args objectAtIndex:0];
+    BOOL animated = args != nil && [args count] > 1 ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:1] def:YES] : YES;
+
+    // Prevent UIKit  crashes when trying to push a window while it's already in the nav stack (e.g. on really slow devices)
+    if ([[[self rootController].navigationController viewControllers] containsObject:window.hostingController]) {
+      NSLog(@"[WARN] Trying to push a view controller that is already in the navigation window controller stack. Skipping open …");
+      return;
+    }
+
+    [navController pushViewController:[window hostingController] animated:animated];
+  } @catch (NSException *ex) {
+    NSLog(@"[ERROR] %@", ex.description);
+  }
 }
 
 - (void)popOnUIThread:(NSArray *)args
@@ -289,6 +307,9 @@
 
   if (window == current) {
     BOOL animated = args != nil && [args count] > 1 ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:1] def:YES] : YES;
+    if (animated && !transitionWithGesture) {
+      transitionIsAnimating = YES;
+    }
     [navController popViewControllerAnimated:animated];
   } else {
     [self closeWindow:window animated:NO];
@@ -317,24 +338,25 @@
 
 - (void)cleanNavStack
 {
-  TiThreadPerformOnMainThread(^{
-    if (navController != nil) {
-      [navController setDelegate:nil];
-      NSArray *currentControllers = [navController viewControllers];
-      [navController setViewControllers:[NSArray array]];
+  TiThreadPerformOnMainThread(
+      ^{
+        if (navController != nil) {
+          [navController setDelegate:nil];
+          NSArray *currentControllers = [navController viewControllers];
+          [navController setViewControllers:[NSArray array]];
 
-      for (UIViewController *viewController in currentControllers) {
-        TiWindowProxy *win = (TiWindowProxy *)[(TiViewController *)viewController proxy];
-        [win setTab:nil];
-        [win setParentOrientationController:nil];
-        [win close:nil];
-      }
-      [navController.view removeFromSuperview];
-      RELEASE_TO_NIL(navController);
-      RELEASE_TO_NIL(rootWindow);
-      RELEASE_TO_NIL(current);
-    }
-  },
+          for (UIViewController *viewController in currentControllers) {
+            TiWindowProxy *win = (TiWindowProxy *)[(TiViewController *)viewController proxy];
+            [win setTab:nil];
+            [win setParentOrientationController:nil];
+            [win close:nil];
+          }
+          [navController.view removeFromSuperview];
+          RELEASE_TO_NIL(navController);
+          RELEASE_TO_NIL(rootWindow);
+          RELEASE_TO_NIL(current);
+        }
+      },
       YES);
 }
 
@@ -369,7 +391,6 @@
   [super viewDidDisappear:animated];
 }
 
-#if IS_XCODE_9
 - (BOOL)homeIndicatorAutoHide
 {
   UIViewController *topVC = [navController topViewController];
@@ -381,7 +402,6 @@
   }
   return [super homeIndicatorAutoHide];
 }
-#endif
 
 - (BOOL)hidesStatusBar
 {

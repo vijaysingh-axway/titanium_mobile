@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2017 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-Present by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +34,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.SparseArray;
-// clang-format off
+
 @Kroll.module
 @Kroll.topLevel({ "Ti", "Titanium" })
 public class TitaniumModule extends KrollModule
-// clang-format on
 {
 	private static final String TAG = "TitaniumModule";
 
@@ -62,11 +62,9 @@ public class TitaniumModule extends KrollModule
 		basePath.push(getCreationUrl().baseUrl);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getUserAgent()
-	// clang-format on
 	{
 		StringBuilder builder = new StringBuilder();
 		String httpAgent = System.getProperty("http.agent");
@@ -77,38 +75,30 @@ public class TitaniumModule extends KrollModule
 		return builder.toString();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getVersion()
-	// clang-format on
 	{
 		return TiApplication.getInstance().getTiBuildVersion();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getBuildTimestamp()
-	// clang-format on
 	{
 		return TiApplication.getInstance().getTiBuildTimestamp();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getBuildDate()
-	// clang-format on
 	{
 		return TiApplication.getInstance().getTiBuildTimestamp();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getBuildHash()
-	// clang-format on
 	{
 		return TiApplication.getInstance().getTiBuildHash();
 	}
@@ -182,13 +172,16 @@ public class TitaniumModule extends KrollModule
 		}
 	}
 
-	private int createTimer(KrollFunction callback, long timeout, Object[] args, boolean interval)
+	private int createTimer(KrollFunction callback, Number timeout, Object[] args, boolean interval)
 	{
 		// Generate an unique identifier for this timer.
 		// This will later be used by the developer to cancel a timer.
 		final int timerId = lastTimerId++;
 
-		Timer timer = new Timer(timerId, getRuntimeHandler(), callback, timeout, args, interval);
+		if (timeout == null || timeout.longValue() < 1L) {
+			timeout = 1L;
+		}
+		Timer timer = new Timer(timerId, getRuntimeHandler(), callback, timeout.longValue(), args, interval);
 		activeTimers.append(timerId, timer);
 
 		timer.schedule();
@@ -216,47 +209,47 @@ public class TitaniumModule extends KrollModule
 		activeTimers.clear();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel
-	public int setTimeout(KrollFunction krollFunction, long timeout, final Object[] args)
-	// clang-format on
+	public int setTimeout(KrollFunction krollFunction, Object[] args)
 	{
+		Number timeout = null;
+		if (args != null && args.length > 0) {
+			timeout = (Number) args[0];
+			args = Arrays.copyOfRange(args, 1, args.length);
+		}
 		return createTimer(krollFunction, timeout, args, false);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel
-	public int setInterval(KrollFunction krollFunction, long timeout, final Object[] args)
-	// clang-format on
+	public int setInterval(KrollFunction krollFunction, Object[] args)
 	{
+		Number timeout = null;
+		if (args != null && args.length > 0) {
+			timeout = (Number) args[0];
+			args = Arrays.copyOfRange(args, 1, args.length);
+		}
 		return createTimer(krollFunction, timeout, args, true);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel
 	public void clearTimeout(int timerId)
-	// clang-format on
 	{
 		cancelTimer(timerId);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel
 	public void clearInterval(int timerId)
-	// clang-format on
 	{
 		cancelTimer(timerId);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel
 	public void alert(Object message)
-	// clang-format on
 	{
 		String msg = (message == null ? null : message.toString());
 
@@ -267,11 +260,9 @@ public class TitaniumModule extends KrollModule
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel("String.format")
-	public String stringFormat(String format, Object args[])
-	// clang-format on
+	public String stringFormat(String format, Object[] args)
 	{
 		try {
 
@@ -291,11 +282,9 @@ public class TitaniumModule extends KrollModule
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel("String.formatDate")
 	public String stringFormatDate(Object date, @Kroll.argument(optional = true) String format)
-	// clang-format on
 	{
 		int style = DateFormat.SHORT;
 
@@ -317,11 +306,9 @@ public class TitaniumModule extends KrollModule
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel("String.formatTime")
 	public String stringFormatTime(Object time)
-	// clang-format on
 	{
 		int style = DateFormat.SHORT;
 
@@ -338,20 +325,16 @@ public class TitaniumModule extends KrollModule
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel("String.formatCurrency")
 	public String stringFormatCurrency(double currency)
-	// clang-format on
 	{
 		return NumberFormat.getCurrencyInstance().format(currency);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.topLevel("String.formatDecimal")
-	public String stringFormatDecimal(Object args[])
-	// clang-format on
+	public String stringFormatDecimal(Object[] args)
 	{
 		String pattern = null;
 		String locale = null;
@@ -399,7 +382,7 @@ public class TitaniumModule extends KrollModule
 	}
 
 	@Kroll.method
-	public String localize(Object args[])
+	public String localize(Object[] args)
 	{
 		String key = (String) args[0];
 		String defaultValue = args.length > 1 ? (String) args[1] : null;

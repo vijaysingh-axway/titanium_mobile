@@ -115,75 +115,59 @@ public class TCPProxy extends KrollProxy implements TiStream
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setHost(String host)
-	// clang-format on
 	{
 		setSocketProperty("host", host);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setPort(int port)
-	// clang-format on
 	{
 		setSocketProperty("port", port);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setTimeout(int timeout)
-	// clang-format on
 	{
 		setSocketProperty("timeout", timeout);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setOptions(KrollDict options)
-	// clang-format on
 	{
 		// not implemented yet - reserved for future use
 		Log.i(TAG, "setting options on socket is not supported yet");
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setListenQueueSize(int listenQueueSize)
-	// clang-format on
 	{
 		setSocketProperty("listenQueueSize", listenQueueSize);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setConnected(KrollFunction connected)
-	// clang-format on
 	{
 		setSocketProperty("connected", connected);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setError(KrollFunction error)
-	// clang-format on
 	{
 		setSocketProperty("error", error);
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setAccepted(KrollFunction accepted)
-	// clang-format on
 	{
 		setSocketProperty("accepted", accepted);
 	}
@@ -198,11 +182,9 @@ public class TCPProxy extends KrollProxy implements TiStream
 		}
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public int getState()
-	// clang-format on
 	{
 		return state;
 	}
@@ -323,7 +305,6 @@ public class TCPProxy extends KrollProxy implements TiStream
 		KrollDict callbackArgs = new KrollDict();
 		callbackArgs.put("socket", this);
 		callbackArgs.putCodeAndMessage(errorCode, error);
-		callbackArgs.put("errorCode", errorCode);
 
 		return callbackArgs;
 	}
@@ -377,7 +358,7 @@ public class TCPProxy extends KrollProxy implements TiStream
 	//public void read(BufferProxy buffer, KrollFunction resultsCallback)
 	//public void read(BufferProxy buffer, int offset, int length)
 	//public void read(BufferProxy buffer, int offset, int length, KrollFunction resultsCallback)
-	public int read(Object args[]) throws Exception
+	public int read(Object[] args) throws Exception
 	{
 		if (!isConnected()) {
 			throw new IOException("Unable to read from socket, not connected");
@@ -390,7 +371,7 @@ public class TCPProxy extends KrollProxy implements TiStream
 	{
 		try {
 			return TiStreamHelper.read(clientSocket.getInputStream(), (BufferProxy) bufferProxy, offset, length);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			String message = e.getMessage();
 			if (message == null) {
@@ -409,7 +390,7 @@ public class TCPProxy extends KrollProxy implements TiStream
 	//public void write(BufferProxy buffer, KrollFunction resultsCallback)
 	//public void write(BufferProxy buffer, int offset, int length)
 	//public void write(BufferProxy buffer, int offset, int length, KrollFunction resultsCallback)
-	public int write(Object args[]) throws Exception
+	public int write(Object[] args) throws Exception
 	{
 		if (!isConnected()) {
 			throw new IOException("Unable to write to socket, not connected");
@@ -422,7 +403,7 @@ public class TCPProxy extends KrollProxy implements TiStream
 	{
 		try {
 			return TiStreamHelper.write(clientSocket.getOutputStream(), (BufferProxy) buffer, offset, length);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			String message = e.getMessage();
 			if (message == null) {
@@ -467,6 +448,17 @@ public class TCPProxy extends KrollProxy implements TiStream
 			e.printStackTrace();
 			throw new IOException("Error occured when closing socket");
 		}
+	}
+
+	@Override
+	public void release()
+	{
+		try {
+			close();
+		} catch (Exception e) {
+			// do nothing...
+		}
+		super.release();
 	}
 
 	@Override

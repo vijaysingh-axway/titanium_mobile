@@ -4,6 +4,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+#define DISABLE_TI_LOG_SERVER
 #import <TitaniumKit/TiApp.h>
 #import <TitaniumKit/TiLogServer.h>
 #import <TitaniumKit/TiSharedConfig.h>
@@ -51,9 +52,25 @@ int main(int argc, char *argv[])
   [[TiSharedConfig defaultConfig] setShowErrorController:TI_APPLICATION_SHOW_ERROR_CONTROLLER];
   [[TiSharedConfig defaultConfig] setApplicationBuildType:TI_APPLICATION_BUILD_TYPE];
   [[TiSharedConfig defaultConfig] setApplicationResourcesDirectory:TI_APPLICATION_RESOURCE_DIR];
+#ifdef DISABLE_TI_LOG_SERVER
+  [[TiSharedConfig defaultConfig] setLogServerEnabled:NO];
+#else
+  [[TiSharedConfig defaultConfig] setLogServerEnabled:YES];
   [[TiLogServer defaultLogServer] setPort:TI_LOG_SERVER_PORT];
-  
-  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+#endif
+
+  UIColor *defaultBgColor = UIColor.blackColor;
+#if defined(DEFAULT_BGCOLOR_RED) && defined(DEFAULT_BGCOLOR_GREEN) && defined(DEFAULT_BGCOLOR_BLUE)
+  defaultBgColor = [UIColor colorWithRed:DEFAULT_BGCOLOR_RED
+                                   green:DEFAULT_BGCOLOR_GREEN
+                                    blue:DEFAULT_BGCOLOR_BLUE
+                                   alpha:1.0f];
+#endif
+  [[TiSharedConfig defaultConfig] setDefaultBackgroundColor:defaultBgColor];
+#if defined(DEBUG) || defined(DEVELOPER)
+  [[TiSharedConfig defaultConfig] setDebugEnabled:YES];
+#endif
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   int retVal = UIApplicationMain(argc, argv, @"TiUIApplication", @"TiApp");
   [pool release];
   return retVal;

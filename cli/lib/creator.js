@@ -18,14 +18,13 @@ const appc = require('node-appc'),
 	async = require('async'),
 	ejs = require('ejs'),
 	fields = require('fields'),
-	fs = require('fs'),
+	fs = require('fs-extra'),
 	http = require('http'),
 	i18n = appc.i18n(__dirname),
 	path = require('path'),
 	request = require('request'),
 	temp = require('temp'),
 	ti = require('node-titanium-sdk'),
-	wrench = require('wrench'),
 	__ = i18n.__,
 	__n = i18n.__n;
 
@@ -92,7 +91,7 @@ Creator.prototype.copyDir = function copyDir(srcDir, destDir, callback, variable
 
 	variables || (variables = {});
 
-	fs.existsSync(destDir) || wrench.mkdirSyncRecursive(destDir);
+	fs.ensureDirSync(destDir);
 
 	const _t = this,
 		ejsRegExp = /\.ejs$/,
@@ -245,7 +244,8 @@ Creator.prototype.configOptionId = function configOptionId(order) {
 };
 
 /**
- * Defines the -c option to selec the code base (Swift or Obj-C).
+ * Defines the -c option to select the code base (Swift or Obj-C).
+ * Kept for backwards compatibility, remove in SDK 10
  *
  * @param {Integer} order - The order to apply to this option.
  *
@@ -266,19 +266,13 @@ Creator.prototype.configOptionCodeBase = function configCodeBase(order) {
 
 	return {
 		abbr: 'c',
-		desc: __('the code base of the project'),
+		desc: __('the code base of the iOS project'),
 		order: order,
 		default: !cli.argv.prompt ? 'objc' : undefined, // if we're prompting, then force the platforms to be prompted for, otherwise force 'all'
-		prompt: function (callback) {
-			callback(fields.text({
-				promptLabel: __('Code base (' + validTypes.join('|') + ')'),
-				default: 'objc',
-				validate: validate
-			}));
-		},
-		required: true,
+		required: false,
 		validate: validate,
-		values: validTypes
+		values: validTypes,
+		hidden: true
 	};
 };
 
@@ -600,7 +594,7 @@ Creator.prototype.downloadFile = function downloadFile(url, callback) {
 	const tempName = temp.path({ suffix: '.zip' }),
 		tempDir = path.dirname(tempName);
 
-	fs.existsSync(tempDir) || wrench.mkdirSyncRecursive(tempDir);
+	fs.ensureDirSync(tempDir);
 
 	this.logger.info(__('Downloading %s', url.cyan));
 
@@ -645,7 +639,7 @@ Creator.prototype.downloadFile = function downloadFile(url, callback) {
  */
 Creator.prototype.unzipFile = function unzipFile(zipFile, callback) {
 	const dir = temp.mkdirSync({ prefix: 'titanium-' });
-	fs.existsSync(dir) || wrench.mkdirSyncRecursive(dir);
+	fs.ensureDirSync(dir);
 	this.logger.info(__('Extracting %s', zipFile.cyan));
 	const logger = this.logger;
 
@@ -653,7 +647,7 @@ Creator.prototype.unzipFile = function unzipFile(zipFile, callback) {
 		// clean up the temp dir
 		if (fs.existsSync(dir)) {
 			logger.debug(__('Removing temp unzip dir: %s', dir.cyan));
-			wrench.rmdirSyncRecursive(dir);
+			fs.rmdirSync(dir);
 		}
 	});
 

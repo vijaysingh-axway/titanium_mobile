@@ -56,14 +56,16 @@ examples:
 
         This example reads string data from a text file.
 
-            // resourcesDirectory is actually the default location, so the first
-            // argument could be omitted here.
-            file = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, "textfile.txt");
-            var blob = file.read();
-            var readText = blob.text;
-            // dispose of file handle & blob.
-            file = null;
-            blob = null;
+        ``` js
+        // resourcesDirectory is actually the default location, so the first
+        // argument could be omitted here.
+        file = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, "textfile.txt");
+        var blob = file.read();
+        var readText = blob.text;
+        // dispose of file handle & blob.
+        file = null;
+        blob = null;
+        ```
   - title: Creating a Subdirectory
     example: |
         Files that the application writes to need to be stored outside of the
@@ -74,21 +76,23 @@ examples:
         myImageID, a string containing some kind of ID for the downloaded image,
         and myImageData, a `Blob` containing JPEG image data.
 
-            var imageDir = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory,
-                'downloaded_images');
-            if (! imageDir.exists()) {
-                imageDir.createDirectory();
-            }
+        ``` js
+        var imageDir = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory,
+            'downloaded_images');
+        if (! imageDir.exists()) {
+            imageDir.createDirectory();
+        }
 
-            // .resolve() provides the resolved native path for the directory.
-            var imageFile  = Ti.Filesystem.getFile(imageDir.resolve(), myImageID + '.jpg');
-            Ti.API.info("ImageFile path is: " + imageFile.resolve());
-            if (imageFile.write(myImageData)===false) {
-                // handle write error
-            }
-            // dispose of file handles
-            imageFile = null;
-            imageDir = null;
+        // .resolve() provides the resolved native path for the directory.
+        var imageFile  = Ti.Filesystem.getFile(imageDir.resolve(), myImageID + '.jpg');
+        Ti.API.info("ImageFile path is: " + imageFile.resolve());
+        if (imageFile.write(myImageData)===false) {
+            // handle write error
+        }
+        // dispose of file handles
+        imageFile = null;
+        imageDir = null;
+        ```
 methods:
   - name: append
     summary: Appends data to the file identified by this file object.
@@ -127,7 +131,7 @@ methods:
     parameters:
       - name: recursive
         summary: |
-          Only available on iOS. Toggles whether to recursively create the directory structure (like mkdir -p).
+          Toggles whether to recursively create the directory structure (like mkdir -p).
           Pass `false` to avoid recursively creating the directory.
           Defaults to true on SDK 7.3.0+, defaults to false on older SDK versions.
         type: Boolean
@@ -155,7 +159,7 @@ methods:
         type: Number
     deprecated:
         since: "7.3.0"
-        notes: Use <Titanium.Filesystem.File.createdAt> instead.
+        notes: Use [createdAt](Titanium.Filesystem.File.createdAt) instead.
 
   - name: createdAt
     summary: Returns the creation Date for the file identified by this file object.
@@ -206,17 +210,17 @@ methods:
     description: |
         Prior to Titanium SDK 7.0.0, on iOS this method returned the path of the parent
         directory as a String. Since Titanium SDK 7.0.0, this method has been deprecated
-        in favor of the <Titanium.Filesystem.File.parent> property and will return
-        a <Titanium.Filesystem.File> reference in the future as well.
+        in favor of the [parent](Titanium.Filesystem.File.parent) property and will return
+        a [File](Titanium.Filesystem.File) reference in the future as well.
     deprecated:
         since: "7.0.0"
         notes: |
-            Use the <Titanium.Filesystem.File.parent> property to receive a `File`
+            Use the [Titanium.Filesystem.File.parent](Titanium.Filesystem.File.parent) property to receive a `File`
             reference instead. If you wish to receive the path, use the `nativePath`
             property of that reference instead.
     returns:
-      - type: String
-      - type: Titanium.Filesystem.File
+      type: [String, Titanium.Filesystem.File]
+      summary: Returns a String on iOS, a `Titanium.Filesystem.File` on Android
 
   - name: getProtectionKey
     summary: |
@@ -246,7 +250,7 @@ methods:
         type: Number
     deprecated:
         since: "7.3.0"
-        notes: Use <Titanium.Filesystem.File.modifiedAt> instead.
+        notes: Use [Titanium.Filesystem.File.modifiedAt](Titanium.Filesystem.File.modifiedAt) instead.
   - name: modifiedAt
     summary: Returns the last modification Date for the file identified by this file object.
     description: |
@@ -446,7 +450,7 @@ properties:
   - name: writeable
     deprecated:
         since: "1.8.1"
-        notes: Use <Titanium.Filesystem.File.writable> instead.
+        notes: Use [Titanium.Filesystem.File.writable](Titanium.Filesystem.File.writable) instead.
         removed: "6.0.0"
     summary: |
         `true` if the file identified by this object is writable.

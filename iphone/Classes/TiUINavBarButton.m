@@ -124,6 +124,9 @@ DEFINE_EXCEPTIONS
   proxy = proxy_; // Don't retain
 
   self.accessibilityLabel = [proxy_ valueForUndefinedKey:@"accessibilityLabel"];
+  self.accessibilityValue = [proxy_ valueForUndefinedKey:@"accessibilityValue"];
+  self.accessibilityHint = [proxy_ valueForUndefinedKey:@"accessibilityHint"];
+  self.accessibilityIdentifier = [TiUtils composeAccessibilityIdentifier:self];
 
   self.width = [TiUtils floatValue:[proxy_ valueForKey:@"width"] def:0.0];
   //A width of 0 is treated as Auto by the iPhone OS, so this is safe.
@@ -198,30 +201,34 @@ DEFINE_EXCEPTIONS
   id changeView = (self.customView != nil) ? (id)self.customView : (id)self;
 
   if ([key isEqualToString:@"title"]) {
-    TiThreadPerformOnMainThread(^{
-      [changeView setTitle_:newValue];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [changeView setTitle_:newValue];
+        },
         NO);
     return;
   }
   if ([key isEqualToString:@"image"]) {
-    TiThreadPerformOnMainThread(^{
-      [changeView setImage_:newValue];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [changeView setImage_:newValue];
+        },
         NO);
     return;
   }
   if ([key isEqualToString:@"width"]) {
-    TiThreadPerformOnMainThread(^{
-      [changeView setWidth_:newValue];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [changeView setWidth_:newValue];
+        },
         NO);
     return;
   }
   if ([key isEqualToString:@"enabled"]) {
-    TiThreadPerformOnMainThread(^{
-      [self setEnabled_:newValue];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self setEnabled_:newValue];
+        },
         NO);
     return;
   }

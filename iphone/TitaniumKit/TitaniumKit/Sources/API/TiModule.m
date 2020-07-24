@@ -21,13 +21,17 @@
 
 - (void)dealloc
 {
+  // Allow JavascriptCore to release module proxy.
+  [self forgetSelf];
+
   // Have to jump through a hoop here to keep the dealloc block from
   // retaining 'self' by creating a __block access ref. Note that
   // this is only safe as long as the block until completion is YES.
   __block id bself = self;
-  TiThreadPerformOnMainThread(^{
-    [bself unregisterForNotifications];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [bself unregisterForNotifications];
+      },
       YES);
 
   RELEASE_TO_NIL(host);
@@ -110,10 +114,14 @@
     classNameLookup = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, NULL);
     //We do not retain the Class, but simply assign them.
   }
-  TiThreadPerformOnMainThread(^{
-    [self registerForNotifications];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self registerForNotifications];
+      },
       NO);
+
+  // Prevent JavascriptCore from releasing module proxy.
+  [self rememberSelf];
 }
 
 - (void)_configure

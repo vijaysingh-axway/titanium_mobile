@@ -13,9 +13,7 @@ import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.TiApplication;
-import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.util.TiPlatformHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,20 +48,16 @@ public class AnalyticsModule extends KrollModule
 		super();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getOptedOut()
-	// clang-format on
 	{
 		return APSAnalytics.getInstance().isOptedOut();
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.setProperty
 	public void setOptedOut(boolean optedOut)
-	// clang-format on
 	{
 		APSAnalytics.getInstance().setOptedOut(optedOut);
 	}
@@ -78,18 +72,17 @@ public class AnalyticsModule extends KrollModule
 			if (event == null) {
 				event = "";
 			}
+			JSONObject payload = null;
 			if (data instanceof HashMap) {
-				analytics.sendAppNavEvent(from, to, TiConvert.toJSON(data));
-
+				payload = TiConvert.toJSON(data);
 			} else if (data != null) {
 				try {
-					analytics.sendAppNavEvent(from, to, new JSONObject(data.toString()));
+					payload = new JSONObject(data.toString());
 				} catch (JSONException e) {
 					Log.e(TAG, "Cannot convert data into JSON");
 				}
-			} else {
-				analytics.sendAppNavEvent(from, to, null);
 			}
+			analytics.sendAppNavEvent(from, to, event, payload);
 		} else {
 			Log.e(
 				TAG,
@@ -201,14 +194,14 @@ public class AnalyticsModule extends KrollModule
 		return SUCCESS;
 	}
 
-	// clang-format off
 	@Kroll.method
 	@Kroll.getProperty
 	public String getLastEvent()
-	// clang-format on
 	{
 		if (TiApplication.getInstance().isAnalyticsEnabled()) {
-			return analytics.getLastEvent().toString();
+			if (analytics.getLastEvent() != null) {
+				return analytics.getLastEvent().toString();
+			}
 		} else {
 			Log.e(
 				TAG,

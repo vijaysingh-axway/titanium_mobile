@@ -1,12 +1,13 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2015-2018 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2015-present by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 
 #ifdef USE_TI_UIIOSAPPLICATIONSHORTCUTS
 #import "TiUIiOSApplicationShortcutsProxy.h"
+#import <TitaniumKit/TiBlob.h>
 #import <TitaniumKit/TiUtils.h>
 #ifdef USE_TI_CONTACTS
 #import "TiContactsPerson.h"
@@ -142,13 +143,15 @@
   }
 
   NSMutableArray *shortcuts = (NSMutableArray *)[UIApplication sharedApplication].shortcutItems;
+  NSMutableIndexSet *shortcutsIndicesToDelete = [[NSMutableIndexSet alloc] init];
 
-  for (UIApplicationShortcutItem *item in shortcuts) {
-    if ([item.type isEqualToString:key]) {
-      [shortcuts removeObject:item];
+  [shortcuts enumerateObjectsUsingBlock:^(UIApplicationShortcutItem *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+    if ([obj.type isEqualToString:key]) {
+      [shortcutsIndicesToDelete addIndex:idx];
     }
-  }
+  }];
 
+  [shortcuts removeObjectsAtIndexes:shortcutsIndicesToDelete];
   [UIApplication sharedApplication].shortcutItems = shortcuts;
 }
 
@@ -206,36 +209,21 @@
   }
 
   if ([value isKindOfClass:[NSString class]]) {
-    return [UIApplicationShortcutIcon iconWithTemplateImageName:[self urlInAssetCatalog:value]];
+    value = ([value hasPrefix:@"/"]) ? [value substringFromIndex:1] : value;
+    return [UIApplicationShortcutIcon iconWithTemplateImageName:value];
   }
+
+#if IS_SDK_IOS_13
+  if ([value isKindOfClass:[TiBlob class]] && [TiUtils isIOSVersionOrGreater:@"13.0"]) {
+    TiBlob *blob = (TiBlob *)value;
+    if (blob.type == TiBlobTypeSystemImage) {
+      return [UIApplicationShortcutIcon iconWithSystemImageName:blob.systemImageName];
+    }
+  }
+#endif
 
   NSLog(@"[ERROR] Ti.UI.iOS.ApplicationShortcuts: Invalid icon provided, defaulting to use no icon.");
   return nil;
-}
-
-- (NSString *)urlInAssetCatalog:(NSString *)url
-{
-  NSString *resultUrl = nil;
-
-  if ([url hasPrefix:@"/"]) {
-    url = [url substringFromIndex:1];
-  }
-
-  unsigned char digest[CC_SHA1_DIGEST_LENGTH];
-  NSData *stringBytes = [url dataUsingEncoding:NSUTF8StringEncoding];
-  if (CC_SHA1([stringBytes bytes], (CC_LONG)[stringBytes length], digest)) {
-    // SHA-1 hash has been calculated and stored in 'digest'.
-    NSMutableString *sha = [[NSMutableString alloc] init];
-    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
-      [sha appendFormat:@"%02x", digest[i]];
-    }
-    [sha appendString:@"."];
-    [sha appendString:[url pathExtension]];
-    resultUrl = [NSMutableString stringWithString:sha];
-    RELEASE_TO_NIL(sha)
-  }
-
-  return resultUrl;
 }
 
 @end

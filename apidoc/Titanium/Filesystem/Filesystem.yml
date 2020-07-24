@@ -12,13 +12,15 @@ examples:
     example: |
         This example writes a string to a text file in a shared directory
 
-            var suiteDir = Ti.Filesystem.directoryForSuite('group.appc.Sharing');
-            if (!suiteDir) {
-                logInApp('Suite Directory not found, check Entitlements.');
-                return;
-            }
-            var f = Ti.Filesystem.getFile(suiteDir,'emptyfile.txt');
-            f.write('The file is no longer empty!');
+        ``` js
+        var suiteDir = Ti.Filesystem.directoryForSuite('group.appc.Sharing');
+        if (!suiteDir) {
+            logInApp('Suite Directory not found, check Entitlements.');
+            return;
+        }
+        var f = Ti.Filesystem.getFile(suiteDir,'emptyfile.txt');
+        f.write('The file is no longer empty!');
+        ```
 methods:
   - name: createTempDirectory
     summary: Creates a temporary directory and returns a [File](Titanium.Filesystem.File) object representing the new directory.
@@ -49,7 +51,9 @@ methods:
         to the current file. For example, if the file `Resources/login/login.js`
         contains the following code:
 
-            var icon = Titanium.Filesystem.getFile('icon.png');
+        ``` js
+        var icon = Titanium.Filesystem.getFile('icon.png');
+        ```
 
         The path is interpreted as `Resources/login/icon.png`.
 
@@ -69,6 +73,7 @@ methods:
         summary: One or more path components. Path arguments are joined together using
             the platform specific path separator to form the full path.
         type: [String, Array<String>]
+        repeatable: true
 
   - name: getAsset
     summary: Returns a `Blob` object representing the asset catalog image identified by the path
@@ -89,7 +94,9 @@ methods:
         to the current file. For example, if the file `Resources/login/login.js`
         contains the following code:
 
-            var icon = Titanium.Filesystem.getAsset('icon.png');
+        ``` js
+        var icon = Titanium.Filesystem.getAsset('icon.png');
+        ```
 
         The path is interpreted as `Resources/login/icon.png`.
 
@@ -104,6 +111,7 @@ methods:
         summary: One or more path components. Path arguments are joined together using
             the platform specific path separator to form the full path.
         type: String
+        repeatable: true
     platforms: [iphone, ipad]
     osver: {ios: {min: "9.0"}}
     since: "5.4.0"
@@ -133,8 +141,8 @@ methods:
         not check the box "Never ask again" when denying the request. If the user checks the box "Never ask again,"
         the user has to manually enable the permission in device settings.
 
-        This method requests `Manifest.permission.READ_EXTERNAL_STORAGE`. If you require other permissions, you can also
-        use <Titanium.Android.requestPermissions>.
+        This method requests `Manifest.permission.READ_EXTERNAL_STORAGE` and `Manifest.permission.WRITE_EXTERNAL_STORAGE`.
+        If you require other permissions, you can also use <Titanium.Android.requestPermissions>.
     parameters:
       - name: callback
         summary: Function to call upon user decision to grant storage access

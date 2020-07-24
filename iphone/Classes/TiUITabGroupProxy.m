@@ -169,6 +169,15 @@ static NSArray *tabGroupKeySequence;
   return NO;
 }
 
+- (void)fireFocusEvent
+{
+  if ([self _hasListeners:@"focus"]) {
+    // on an open, make sure we send the focus event to focused tab
+    NSDictionary *event = [((TiUITabGroup *)self.view) focusEvent];
+    [self fireEvent:@"focus" withObject:event];
+  }
+}
+
 - (void)gainFocus
 {
   if (!focussed) {
@@ -267,7 +276,6 @@ static NSArray *tabGroupKeySequence;
   return [super preferredStatusBarStyle];
 }
 
-#if IS_XCODE_9
 - (BOOL)homeIndicatorAutoHide
 {
   UITabBarController *tabController = [(TiUITabGroup *)[self view] tabController];
@@ -277,7 +285,6 @@ static NSArray *tabGroupKeySequence;
   }
   return [super homeIndicatorAutoHide];
 }
-#endif
 
 - (BOOL)hidesStatusBar
 {

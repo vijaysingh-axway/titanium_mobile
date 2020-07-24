@@ -4,30 +4,27 @@ summary: |
     A list view is used to present information, organized in to sections and items,
     in a vertically-scrolling view.
 description: |
-    <table id="platformComparison">
-      <tr>
-        <td><img src="images/listview/listview_android.png" height="200" style="border: 1px solid black;"/></td>
-        <td><img src="images/listview/listview_ios.png" height="200" style="border: 1px solid black;"/></td>
-        <td><img src="images/listview/listview_wp.png" height="200" style="border: 1px solid black;"/></td>
-      </tr>
-      <tr><th>Android</th><th>iOS</th><th>Windows Phone</th></tr>
-    </table>
+    | Android | iOS | Windows |
+    | ------- | --- | ------- |
+    | ![Android](./listview_android.png) | ![iOS](./listview_ios.png) | ![Windows](./listview_wp.png) |
 
     Use the <Titanium.UI.createListView> method or **`<ListView>`** Alloy element to create a `ListView`.
-    
-    A `ListView` object is a container for [ListSection](Titanium.UI.ListSection) 
-    objects that are, in turn, containers for [ListItem](Titanium.UI.ListItem) objects. This is 
+
+    A `ListView` object is a container for [ListSection](Titanium.UI.ListSection)
+    objects that are, in turn, containers for [ListItem](Titanium.UI.ListItem) objects. This is
     easily visualized as an Alloy view:
 
-        <Alloy>
-            <ListView id="list">
-                <ListSection>
-                    <ListItem title="List item 1"></ListItem>
-                    <ListItem title="List item 2"></ListItem>
-                    <ListItem title="List item 3"></ListItem>
-                </ListSection>
-            </ListView>
-        </Alloy>        
+    ``` xml
+    <Alloy>
+        <ListView id="list">
+            <ListSection>
+                <ListItem title="List item 1"></ListItem>
+                <ListItem title="List item 2"></ListItem>
+                <ListItem title="List item 3"></ListItem>
+            </ListSection>
+        </ListView>
+    </Alloy>
+    ```
 
     For more instructions and examples of using `ListView`, refer to the
     [ListViews guide](https://docs.appcelerator.com/platform/latest/#!/guide/ListViews).
@@ -91,7 +88,7 @@ description: |
     `TableViewSection` is implicitly created and added to the `TableView`.
 
     A `ListItem` object is not created in the same method as a `TableViewRow`.
-    A `ListItem` is create by passing an array of `ListDataItem` objects to the `ListSection`.
+    A `ListItem` is created by passing an array of `ListDataItem` objects to the `ListSection`.
 
     You cannot add views to a `ListItem` using the `add` method, which could be done with a
     `TableViewRow`. To add views to a `ListItem`, you need to define an <ItemTemplate>,
@@ -151,7 +148,7 @@ description: |
 
     When a [TextField](Titanium.UI.TextField) is placed in a row near the bottom of a `ListView`,
     in a window that is configured with
-    [SOFT_INPUT_ADJUST_PAN](Titanium.UI.Android.SOFT_INPUT_ADJUST_PAN), it is expected for the 
+    [SOFT_INPUT_ADJUST_PAN](Titanium.UI.Android.SOFT_INPUT_ADJUST_PAN), it is expected for the
     text field to automatically move to a visible position after it is focused and the software
     keyboard displayed. However, due to a known problem caused by native Android's `ListView` behavior,
     the keyboard is likely to completely obscure the text field.
@@ -165,8 +162,8 @@ description: |
 
     - **ListItem properties**:
 
-        - [canEdit](Titanium.UI.ListItem.canEdit) - When this is set to true, it allows the item to be deleted 
-          from the ListView through a user initiated action. The item can only be deleted when the ListView is 
+        - [canEdit](Titanium.UI.ListItem.canEdit) - When this is set to true, it allows the item to be deleted
+          from the ListView through a user initiated action. The item can only be deleted when the ListView is
           in editing mode. The ListView can enter 'editing' mode either by explicitly setting the [editing](Titanium.UI.ListView.editing)
           property to true, or by swiping accross an item whose `canEdit` property is set to true. When the user
           deletes the item, a [delete](Titanium.UI.ListView.delete) event is fired.
@@ -186,8 +183,8 @@ description: |
           and [appendItems](Titanium.UI.ListSection.appendItems).
 
         - [canMove](Titanium.UI.ListItem.canMove) - When this item is set to true, it allows the item to be moved
-          to a different location within the ListView. The item can only be moved when the ListView is put in 
-          editing mode by explicitly setting the [editing](Titanium.UI.ListView.editing) property to true. When the 
+          to a different location within the ListView. The item can only be moved when the ListView is put in
+          editing mode by explicitly setting the [editing](Titanium.UI.ListView.editing) property to true. When the
           user moves an item, a [move](Titanium.UI.ListView.move) event is fired.
 
     - **ListView properties**:
@@ -195,8 +192,8 @@ description: |
         - [editing](Titanium.UI.ListView.editing) - Determines if the List View is in a state where items can
           be deleted or reordered.
 
-        - [pruneSectionsOnEdit](Titanium.UI.ListView.pruneSectionsOnEdit) - When this property is set to true and the 
-          user action results in a section having no other items, the section is deleted from the List View. Please note 
+        - [pruneSectionsOnEdit](Titanium.UI.ListView.pruneSectionsOnEdit) - When this property is set to true and the
+          user action results in a section having no other items, the section is deleted from the List View. Please note
           that this property only applies to the sections whose items are being edited.
 
 platforms: [android, ipad, iphone]
@@ -213,7 +210,7 @@ events:
     summary: Fired when the index bar is clicked by the user.
     description: |
         If the list view contains the [sectionIndexTitles](Titanium.UI.ListView.sectionIndexTitles) array of indices the index bar will appear on the side.
-        This event will fire when this bar is clicked 
+        This event will fire when this bar is clicked
     properties:
       - name: title
         summary: The title of the index clicked.
@@ -230,7 +227,7 @@ events:
     description: |
         Do not rely on the `source` property to determine which item fired the event.  Use the
         `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
     properties:
       - name: section
         summary: List section if the item is contained in a list section.
@@ -262,12 +259,27 @@ events:
         type: Boolean
         platforms: [iphone, ipad]
 
+  - name: itemsselected
+    summary: |
+      Fired when user stops two-pan gesture interaction for selecting multiple items.
+      It is used with <Titanium.UI.ListView.allowsMultipleSelectionInteraction>.
+    properties:
+      - name: selectedItems
+        summary: List of items selected by user.
+        type: Array<SelectedItem>
+
+      - name: startingItem
+        summary: First item selected when user started interaction.
+        type: SelectedItem
+    platforms: [iphone, ipad]
+    since: 8.2.0
+
   - name: delete
     summary: Fired when a list row is deleted by the user.
     description: |
         Do not rely on the `source` property to determine which item fired the event.  Use the
         `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
 
         Note that the `sectionIndex` and `itemIndex` properties of this event correspond to the List View state
         before the user action.
@@ -293,13 +305,13 @@ events:
       - name: bubbles
         summary: false. This event does not bubble.
         type: Boolean
-        
+
   - name: insert
     summary: Fired when a list row is inserted by the user.
     description: |
         Do not rely on the `source` property to determine which item fired the event.  Use the
         `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
 
         Note that the `sectionIndex` and `itemIndex` properties of this event correspond to the List View state
         before the user action.
@@ -375,7 +387,7 @@ events:
     description: |
         Do not rely on the `source` property to determine which item fired the event.  Use the
         `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
 
         Note that the `sectionIndex`,`itemIndex`,`targetSectionIndex` and `targetItemIndex` properties of this event correspond to the List View state
         before the user action.
@@ -447,14 +459,14 @@ events:
 
   - name: prefetch
     summary: |
-        Fired when new list items are prefetched. The items are ordered ascending by geometric distance 
+        Fired when new list items are prefetched. The items are ordered ascending by geometric distance
         from the list view. Note that this event is only available on iOS 10 and later.
     since: 6.1.0
     osver: {ios: {min: "10.0"}}
     platforms: [iphone, ipad]
     description: |
         Use the `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
     properties:
       - name: prefetchedItems
         summary: An array of prefetched items.
@@ -462,14 +474,14 @@ events:
 
   - name: cancelprefetch
     summary: |
-        Fired when list items that previously were considered as candidates for pre-fetching were not 
+        Fired when list items that previously were considered as candidates for pre-fetching were not
         actually used. Note that this event is only available on iOS 10 and later
     since: 6.1.0
     osver: {ios: {min: "10.0"}}
     platforms: [iphone, ipad]
     description: |
         Use the `sectionIndex` and `itemIndex`, or the `itemId` to determine the list item that generated
-        the event, and use the `bindId` to check which child control fired the event. 
+        the event, and use the `bindId` to check which child control fired the event.
     properties:
       - name: prefetchedItems
         summary: An array of prefetched items.
@@ -503,7 +515,7 @@ events:
 
       - name: identifier
         summary: |
-            The [identifier](RowActionType. identifier) of the row action. Only included in the event 
+            The [identifier](RowActionType. identifier) of the row action. Only included in the event
             if previously defined. Available in Titanium 6.0.0 and later.
         type: String
 
@@ -529,9 +541,9 @@ events:
 
   - name: rowAction
     deprecated:
-        since: 5.0.0
-        removed: 5.0.0
-        notes: Use <Titanium.UI.ListView.editaction> instead.
+        since: "5.0.0"
+        removed: "5.0.0"
+        notes: Use [Titanium.UI.ListView.editaction](Titanium.UI.ListView.editaction) instead.
     summary: Fired when the user interacts with one of the custom edit actions defined by <Titanium.UI.ListItem.editActions>.
     description: |
         Do not rely on the `source` property to determine which item fired the event.  Use the
@@ -571,18 +583,18 @@ events:
   - name: scrollstart
     summary: Fires when the list view starts scrolling by user interaction. Calling the `scrollTo` methods will not fire this event
     description: |
-        This event will fire when the user starts scrolling the list view. Use the `firstVisibleSectionIndex` and 
+        This event will fire when the user starts scrolling the list view. Use the `firstVisibleSectionIndex` and
         the `firstVisibleItemIndex` to determine the position of the list view.
     platforms: [iphone, ipad, android]
     since: 4.1.0
-    properties: 
+    properties:
       - name: visibleItemCount
         summary: The number of visible items in the list view when the event fires.
         type: Number
 
       - name: firstVisibleItem
-        summary: The first visible item in the list view when the event fires; this item might not be fully visible.
-        type: Object
+        summary: The first visible item in the list view when the event fires; this item might not be fully visible. May be -1 on iOS.
+        type: [Object, Number]
 
       - name: firstVisibleSection
         summary: The first visible section in the list view when the event fires.
@@ -607,18 +619,18 @@ events:
   - name: scrollend
     summary: Fires when the list view ends scrolling. Calling the `scrollTo` methods will not fire this event
     description: |
-        This event will fire when the list view ends scrolling. Use the `firstVisibleSectionIndex` and 
+        This event will fire when the list view ends scrolling. Use the `firstVisibleSectionIndex` and
         the `firstVisibleItemIndex` to determine the position of the list view.
     platforms: [iphone, ipad, android]
     since: 4.1.0
-    properties: 
+    properties:
       - name: visibleItemCount
         summary: The number of visible items in the list view when the event fires.
         type: Number
 
       - name: firstVisibleItem
-        summary: The first visible item in the list view when the event fires; this item might not be fully visible.
-        type: Object
+        summary: The first visible item in the list view when the event fires; this item might not be fully visible. May be -1 on iOS.
+        type: [Object, Number]
 
       - name: firstVisibleSection
         summary: The first visible section in the list view when the event fires.
@@ -641,7 +653,7 @@ events:
     description: |
         This event will fire while the list view is scrolling and the user releases the finger.
         On iOS no event is fired when the finger is not released. Use  `direction` to determine the scroll direction,
-        `velocity` to determine scroll speed, targetContentOffset to determine where the scrolling will end (in dpi). 
+        `velocity` to determine scroll speed, targetContentOffset to determine where the scrolling will end (in dpi).
         When `direction` is `down`, `velocity` is negative and viceversa. On Android `velocity` and `targetContentOffset` is 0.
 
     platforms: [android, iphone, ipad]
@@ -660,7 +672,7 @@ events:
 
       - name: targetContentOffset
         summary: |
-           The expected y axis offset when the scrolling action decelerates to a stop. 
+           The expected y axis offset when the scrolling action decelerates to a stop.
         type: Number
 
 properties:
@@ -690,7 +702,7 @@ properties:
   - name: disableBounce
     summary: Determines whether the scroll-bounce of the list view should be disabled.
     description: |
-        Set to `true` to disable the vertical bounce.        
+        Set to `true` to disable the vertical bounce.
     type: Boolean
     default: false
     since: 5.4.0
@@ -705,6 +717,16 @@ properties:
     since: 3.2.0
     platforms: [iphone, ipad]
 
+  - name: fastScroll
+    summary: Sets the fastScroll mode on Android ListViews.
+    description: |
+        Set to `true` to enable fastScroll mode.  When fast scrolling is enabled, the user
+        can quickly scroll through lists by dragging the fast scroll thumb.
+    type: Boolean
+    default: false
+    since: 7.5.0
+    platforms: [android]
+
   - name: allowsSelectionDuringEditing
     summary: Determines whether this list view items can be selected while editing the table.
     type: Boolean
@@ -717,6 +739,19 @@ properties:
     type: Boolean
     default: false
     since: "7.0.0"
+    platforms: [iphone, ipad]
+
+  - name: allowsMultipleSelectionInteraction
+    summary: Allows a two-finger pan gesture to automatically transition the table view into editing mode and start selecting rows.
+    description: |
+        Setting this property to true allows the user to start selecting multiple contiguous rows via a two-finger pan gesture.
+        If the table view is already in editing mode, the user can also select multiple rows via a one-finger pan gesture along
+        the edge of the table that contains editing controls (checkboxes). In order to support this behavior,
+        you must also set <Titanium.UI.ListView.allowsMultipleSelectionDuringEditing> to true.
+        Once user interaction stops the <Titanium.UI.ListView.itemsselected> event is fired.
+    type: Boolean
+    default: false
+    since: 8.2.0
     platforms: [iphone, ipad]
 
   - name: lazyLoadingEnabled
@@ -797,7 +832,7 @@ properties:
     default: undefined but behaves as false
     platforms: [android]
     since: "3.3.0"
-    
+
   - name: headerTitle
     summary: List view header title.
     type: String
@@ -805,7 +840,7 @@ properties:
   - name: headerView
     summary: List view header as a view that will be rendered instead of a label.
     description: |
-        On Android, this is a creation only property. 
+        On Android, this is a creation only property.
         In Alloy you can specify this property with a `<HeaderView>` child element of a `<ListView>`
         element (see Examples).
 
@@ -825,20 +860,22 @@ properties:
         In Alloy you can assign this property with a `<PullView>` child element of a `<ListView>`
         element:
 
-            <Alloy>
-              <ListView>
-                <ListSection>
-                  <ListItem title="Item a"></ListItem>
-                  <ListItem title="Item b"></ListItem>
-                  <ListItem title="Item c"></ListItem>
-                </ListSection>
-                <PullView>
-                  <View height="50" backgroundColor="black">
-                    <Label/>
-                  </View>
-                </PullView>
-              </ListView>
-            </Alloy>
+        ``` xml
+        <Alloy>
+          <ListView>
+            <ListSection>
+              <ListItem title="Item a"></ListItem>
+              <ListItem title="Item b"></ListItem>
+              <ListItem title="Item c"></ListItem>
+            </ListSection>
+            <PullView>
+              <View height="50" backgroundColor="black">
+                <Label/>
+              </View>
+            </PullView>
+          </ListView>
+        </Alloy>
+        ```
 
         See the code example on `pullView` to  see how it may be utilized.
     type: Titanium.UI.View
@@ -866,14 +903,16 @@ properties:
 
         In an Alloy application, you can use a `<SearchView>` or `<SearchBar>` element inside a `<ListView>` element.
 
-            <Alloy>
-                <ListView>
-                   <!-- search, shorthand with Ti.UI.SearchBar -->
-                  <SearchBar class="search" platform="ios"/>
-                  <!-- search, shorthand with Ti.UI.Android.SearchView -->
-                  <SearchView ns="Ti.UI.Android" class="search" platform="android"/>
-                </ListView>
-            </Alloy>
+        ``` xml
+        <Alloy>
+            <ListView>
+                <!-- search, shorthand with Ti.UI.SearchBar -->
+              <SearchBar class="search" platform="ios"/>
+              <!-- search, shorthand with Ti.UI.Android.SearchView -->
+              <SearchView ns="Ti.UI.Android" class="search" platform="android"/>
+            </ListView>
+        </Alloy>
+        ```
 
     type: [Titanium.UI.SearchBar, Titanium.UI.Android.SearchView]
     platforms: [android, iphone, ipad]
@@ -898,7 +937,7 @@ properties:
   - name: caseInsensitiveSearch
     summary: Determines if the search performed is case insensitive.
     description: |
-        Used in conjunction with [searchView](Titanium.UI.ListView.searchView) and  [searchText](Titanium.UI.ListView.searchText) properties of 
+        Used in conjunction with [searchView](Titanium.UI.ListView.searchView) and  [searchText](Titanium.UI.ListView.searchText) properties of
         List View and [searchableText](Titanium.UI.ListItem.searchableText) property of List Item.
     type: Boolean
     default: true
@@ -965,10 +1004,10 @@ properties:
   - name: separatorColor
     summary: Separator line color between items, as a color name or hex triplet.
     description: |
-        To make the line invisible, set this property to `transparent`, or the same value as the 
-        [backgroundColor](Titanium.UI.ListView.backgroundColor) property. 
-        For information about color values, see the "Colors" section of <Titanium.UI>. 
-    type: String
+        To make the line invisible, set this property to `transparent`, or the same value as the
+        [backgroundColor](Titanium.UI.ListView.backgroundColor) property.
+        For information about color values, see the "Colors" section of <Titanium.UI>.
+    type: [String, Titanium.UI.Color]
     default: platform-specific default color
     since: 3.2.0
     platforms: [android, iphone, ipad]
@@ -977,23 +1016,23 @@ properties:
     summary: The insets for list view separators (applies to all cells).
     deprecated:
         since: "5.2.0"
-        notes: Use <Titanium.UI.ListView.listSeparatorInsets> instead.
+        notes: Use [Titanium.UI.ListView.listSeparatorInsets](Titanium.UI.ListView.listSeparatorInsets) instead.
     description: |
-        Cell separators do not extend all the way to the edge of the list view. 
-        This property sets the default inset for all cells in the table. 
-        Set this to a dictionary with two keys, `left` specifying inset from left edge and `right` specifying the inset from the right edge. 
-    type: Dictionary
+        Cell separators do not extend all the way to the edge of the list view.
+        This property sets the default inset for all cells in the table.
+        Set this to a dictionary with two keys, `left` specifying inset from left edge and `right` specifying the inset from the right edge.
+    type: HorizontalInsets
     since: 3.2.0
     osver: {ios: {min: "7.0"}}
     platforms: [iphone, ipad]
 
   - name: separatorStyle
-    summary: Separator style constant. 
+    summary: Separator style constant.
     type: Number
     constants: Titanium.UI.TABLE_VIEW_SEPARATOR_STYLE_*
-    since: {android: "5.2.0", iphone: "3.2.0", ipad: "3.2.0"} 
+    since: {android: "8.1.0", iphone: "3.2.0", ipad: "3.2.0"}
 
-    platforms: [iphone, ipad]
+    platforms: [iphone, ipad, android]
 
   - name: style
     summary: Style of the list view.
@@ -1007,22 +1046,22 @@ properties:
   - name: tableSeparatorInsets
     deprecated:
         since: "5.4.0"
-        notes: Use <Titanium.UI.ListView.listSeparatorInsets> instead.
+        notes: Use [Titanium.UI.ListView.listSeparatorInsets](Titanium.UI.ListView.listSeparatorInsets) instead.
     summary: The insets for the table view header and footer.
     description: |
         Cell separators do not extend all the way to the edge of the list view. Set this to a
         dictionary with two keys, `left` specifying inset from left edge and `right` specifying the inset from the
         right edge. If the rowSeparatorInsets is not set, the tableSeparatorInsets will also set the cell insets.
- 
-        For example:
- 
-             listView.setTableSeparatorInsets({
-                 left:10,
-                 right:10
-             });
 
-  
-    type: Dictionary
+        For example:
+
+        ``` js
+        listView.setTableSeparatorInsets({
+            left:10,
+            right:10
+        });
+        ```
+    type: HorizontalInsets
     since: "5.2.0"
     osver: {ios: {min: "7.0"}}
     platforms: [iphone, ipad]
@@ -1033,16 +1072,15 @@ properties:
         Cell separators do not extend all the way to the edge of the list view. Set this to a
         dictionary with two keys, `left` specifying inset from left edge and `right` specifying the inset from the
         right edge. If the rowSeparatorInsets is not set, the listSeparatorInsets will also set the cell insets.
- 
-        For example:
- 
-             listView.setListSeparatorInsets({
-                 left:10,
-                 right:10
-             });
 
-  
-    type: Dictionary
+        For example:
+        ``` js
+        listView.setListSeparatorInsets({
+            left:10,
+            right:10
+        });
+        ```
+    type: HorizontalInsets
     since: "5.4.0"
     osver: {ios: {min: "7.0"}}
     platforms: [iphone, ipad]
@@ -1053,56 +1091,69 @@ properties:
         Cell separators do not extend all the way to the edge of the list view. Set this to a
         dictionary with two keys, `left` specifying inset from left edge and `right` specifying the inset from the
         right edge. This property is only available upon creation of the cells.
- 
-        For example:
- 
-             listView.setRowSeparatorInsets({
-                 left:10,
-                 right:10
-             });
 
-    type: Dictionary
+        For example:
+        ``` js
+        listView.setRowSeparatorInsets({
+            left:10,
+            right:10
+        });
+        ```
+    type: HorizontalInsets
     since: "5.2.0"
     osver: {ios: {min: "7.0"}}
-    platforms: [iphone, ipad] 
+    platforms: [iphone, ipad]
 
   - name: dimBackgroundForSearch
     summary: A Boolean indicating whether the underlying content is dimmed during a search.
     description: |
-          If you do not want to show the dimmed background when clicking on the search bar, 
-          set this property `false` during creation. 
+          If you do not want to show the dimmed background when clicking on the search bar,
+          set this property `false` during creation.
     type: Boolean
-    default: true 
+    default: true
     since: 6.2.0
     platforms: [iphone, ipad]
+    availability: creation
+
+  - name: showSearchBarInNavBar
+    summary: A Boolean indicating whether search bar will be in navigation bar.
+    description: |
+          If you want to show the search bar in navigation bar, set this property `true` during creation.
+          Use the <Titanium.UI.Window.hidesSearchBarWhenScrolling> property to control the visibility of the
+          searchbar when scrolling.
+    type: Boolean
+    default: false
+    since: 8.1.0
+    platforms: [iphone, ipad]
+    osver: {ios: {min: "11.0"}}
     availability: creation
 
   - name: resultsBackgroundColor
     summary: The background color of the search results (iOS-only).
     description: |
-        For information about color values, see the "Colors" section of <Titanium.UI>. 
+        For information about color values, see the "Colors" section of <Titanium.UI>.
         Note: A transparent background-color is not officially supported by Apple to
-        prevent that the list of results overlaps with the list view below it.  
-    type: String
-    default: undefined (behaves as white) 
+        prevent that the list of results overlaps with the list view below it.
+    type: [String, Titanium.UI.Color]
+    default: undefined (behaves as white)
     since: 6.1.0
     platforms: [iphone, ipad]
     availability: creation
 
   - name: resultsSeparatorColor
-    summary: | 
-        Separator line color between rows inside search results, 
+    summary: |
+        Separator line color between rows inside search results,
         as a color name or hex triplet (iOS-only).
     description: |
-        To make the line invisible, set this property to `transparent`, or the same value as the 
-        [backgroundColor](Titanium.UI.ListView.backgroundColor) property. 
-        For information about color values, see the "Colors" section of <Titanium.UI>. 
-    type: String
-    default: undefined (behaves as gray) 
+        To make the line invisible, set this property to `transparent`, or the same value as the
+        [backgroundColor](Titanium.UI.ListView.backgroundColor) property.
+        For information about color values, see the "Colors" section of <Titanium.UI>.
+    type: [String, Titanium.UI.Color]
+    default: undefined (behaves as gray)
     since: 6.1.0
     platforms: [iphone, ipad]
     availability: creation
-    
+
   - name: resultsSeparatorStyle
     summary: The separator style of the search results (iOS-only).
     type: Number
@@ -1112,24 +1163,24 @@ properties:
     availability: creation
 
   - name: resultsSeparatorInsets
-    summary: | 
-        The insets for search results separators (applies to all cells & iOS-only). 
+    summary: |
+        The insets for search results separators (applies to all cells & iOS-only).
     description: |
-        Cell separators do not extend all the way to the edge of the list view. 
-        This property sets the default inset for all cells in the table. 
-        Set this to a dictionary with two keys, `left` specifying inset from left edge and `right` 
-        specifying the inset from the right edge. 
-    type: Dictionary
-    since: 6.1.0
+        Cell separators do not extend all the way to the edge of the list view.
+        This property sets the default inset for all cells in the table.
+        Set this to a dictionary with two keys, `left` specifying inset from left edge and `right`
+        specifying the inset from the right edge.
+    type: HorizontalInsets
+    since: "6.1.0"
     platforms: [iphone, ipad]
     availability: creation
-    
+
   - name: selectedItems
-    summary: Returns the selected list view items. 
+    summary: Returns the selected list view items.
     type: Array<ListItemEventType>
     since: "7.0.0"
     platforms: [iphone, ipad]
-    
+
 methods:
   - name: scrollToItem
     summary: Scrolls to a specific item.
@@ -1231,6 +1282,7 @@ methods:
       - name: animation
         summary: Animation properties. (iOS only.)
         type: ListViewAnimationProperties
+        optional: true
 
   - name: selectItem
     summary: Selects an item in the list using the specified item and section indices.
@@ -1247,19 +1299,25 @@ methods:
   - name: setContentInsets
     summary: Sets this list view's content insets.
     description: |
-        A list view is essentially a scroll view that contains a set of static row views that 
-        represents the content. Thus, the `setContentInsets` method facilitates a margin, or inset, 
+        A list view is essentially a scroll view that contains a set of static row views that
+        represents the content. Thus, the `setContentInsets` method facilitates a margin, or inset,
         distance between the content and the container scroll view.
-        
+
         Typically used with the [pullView](Titanium.UI.ListView.pullView) property.
     parameters:
       - name: edgeInsets
-        summary: Dictionary to describe the insets.
-        type: ListViewEdgeInsets
-        
-      - name: animated
-        summary: Determines whether, and how, the content inset change should be animated.
-        type: ListViewContentInsetOption
+        summary: |
+          Sets the distance that the content view is inset from the enclosing scroll view of the list view.
+          For example
+
+              setContentInset({top:50,bottom:10,right:10,left:10}, {animated:true})
+        type: Padding
+
+      - name: options
+        summary: |
+            Determines whether, and how, the content inset change should be animated.
+            Note that the default here is equivalent to passing in `{ animated: false, duration: 300 }`
+        type: AnimatedWithDurationOptions
         optional: true
     platforms: [iphone, ipad]
     since: 3.2.0
@@ -1270,28 +1328,33 @@ methods:
     parameters:
       - name: contentOffset
         summary: |
-            Dictionary with the properties `x`, `y`. Pass in `animated` `true` as a second dictionary parameter.
+            Dictionary with the properties `x`, `y`.
             The `x` and `y` coordinates reposition the top-left point of the scrollable region of the list view.
-            The `animated` property is optional and set to `false` by default. 
-        type: Dictionary
+        type: Point
+      - name: options
+        summary: |
+            Pass in `{ animated: true }` to animate the transition. Note that the default here is equivalent to passing in `{ animated: false }`
+        type: AnimatedOptions
+        optional: true
+        default: "{ animated: false }"
     since: 3.4.0
 
   - name: setMarker
     summary: Sets a reference item in the list view.
     description: |
         This method replaces previous reference items with the current one.
-        See [marker](Titanium.UI.ListView.marker) event for details. 
+        See [marker](Titanium.UI.ListView.marker) event for details.
     parameters:
       - name: markerProps
         summary: Dictionary to describe the reference item.
         type: ListViewMarkerProps
     platforms: [iphone, ipad, android]
     since: 3.2.0
-    
+
   - name: addMarker
     summary: Adds a reference item in the list view.
     description: |
-        See [marker](Titanium.UI.ListView.marker) event for details. 
+        See [marker](Titanium.UI.ListView.marker) event for details.
     parameters:
       - name: markerProps
         summary: Dictionary to describe the reference item.
@@ -1305,115 +1368,119 @@ examples:
         Creates a list with three sections, each with two rows.
         Adds two sections to the table before and one after it is rendered.
 
-            var win = Ti.UI.createWindow({backgroundColor: 'white'});
-            var listView = Ti.UI.createListView();
-            var sections = [];
+        ``` js
+        var win = Ti.UI.createWindow({backgroundColor: 'gray'});
+        var listView = Ti.UI.createListView();
+        var sections = [];
 
-            var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits'});
-            var fruitDataSet = [
-                {properties: { title: 'Apple'}},
-                {properties: { title: 'Banana'}},
-            ];
-            fruitSection.setItems(fruitDataSet);
-            sections.push(fruitSection);
+        var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits'});
+        var fruitDataSet = [
+            {properties: { title: 'Apple'}},
+            {properties: { title: 'Banana'}},
+        ];
+        fruitSection.setItems(fruitDataSet);
+        sections.push(fruitSection);
 
-            var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables'});
-            var vegDataSet = [
-                {properties: { title: 'Carrots'}},
-                {properties: { title: 'Potatoes'}},
-            ];
-            vegSection.setItems(vegDataSet);
-            sections.push(vegSection);
+        var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables'});
+        var vegDataSet = [
+            {properties: { title: 'Carrots'}},
+            {properties: { title: 'Potatoes'}},
+        ];
+        vegSection.setItems(vegDataSet);
+        sections.push(vegSection);
 
-            listView.sections = sections;
-            win.add(listView);
-            win.open();
+        listView.sections = sections;
+        win.add(listView);
+        win.open();
 
-            var fishSection = Ti.UI.createListSection({ headerTitle: 'Fish'});
-            var fishDataSet = [
-                {properties: { title: 'Cod'}},
-                {properties: { title: 'Haddock'}},
-            ];
-            fishSection.setItems(fishDataSet);
-            listView.appendSection(fishSection);
+        var fishSection = Ti.UI.createListSection({ headerTitle: 'Fish'});
+        var fishDataSet = [
+            {properties: { title: 'Cod'}},
+            {properties: { title: 'Haddock'}},
+        ];
+        fishSection.setItems(fishDataSet);
+        listView.appendSection(fishSection);
+        ```
 
   - title: List View with Custom Item Template
     example: |
         Modifies the previous example to create a list using an item template to customize the view layout.
 
-            var win = Ti.UI.createWindow({backgroundColor: 'white'});
+        ``` js
+        var win = Ti.UI.createWindow({backgroundColor: 'white'});
 
-            // Create a custom template that displays an image on the left, 
-            // then a title next to it with a subtitle below it.
-            var myTemplate = {
-                childTemplates: [
-                    {                            // Image justified left
-                        type: 'Ti.UI.ImageView', // Use an image view for the image
-                        bindId: 'pic',           // Maps to a custom pic property of the item data
-                        properties: {            // Sets the image view  properties
-                            width: '50dp', height: '50dp', left: 0
-                        }
-                    },
-                    {                            // Title 
-                        type: 'Ti.UI.Label',     // Use a label for the title 
-                        bindId: 'info',          // Maps to a custom info property of the item data
-                        properties: {            // Sets the label properties
-                            color: 'black',
-                            font: { fontFamily:'Arial', fontSize: '20dp', fontWeight:'bold' },
-                            left: '60dp', top: 0,
-                        }
-                    },
-                    {                            // Subtitle
-                        type: 'Ti.UI.Label',     // Use a label for the subtitle
-                        bindId: 'es_info',       // Maps to a custom es_info property of the item data
-                        properties: {            // Sets the label properties
-                            color: 'gray',
-                            font: { fontFamily:'Arial', fontSize: '14dp' },
-                            left: '60dp', top: '25dp',
-                        }
+        // Create a custom template that displays an image on the left,
+        // then a title next to it with a subtitle below it.
+        var myTemplate = {
+            childTemplates: [
+                {                            // Image justified left
+                    type: 'Ti.UI.ImageView', // Use an image view for the image
+                    bindId: 'pic',           // Maps to a custom pic property of the item data
+                    properties: {            // Sets the image view  properties
+                        width: '50dp', height: '50dp', left: 0
                     }
-                ]
-            };
+                },
+                {                            // Title
+                    type: 'Ti.UI.Label',     // Use a label for the title
+                    bindId: 'info',          // Maps to a custom info property of the item data
+                    properties: {            // Sets the label properties
+                        color: 'black',
+                        font: { fontFamily:'Arial', fontSize: '20dp', fontWeight:'bold' },
+                        left: '60dp', top: 0,
+                    }
+                },
+                {                            // Subtitle
+                    type: 'Ti.UI.Label',     // Use a label for the subtitle
+                    bindId: 'es_info',       // Maps to a custom es_info property of the item data
+                    properties: {            // Sets the label properties
+                        color: 'gray',
+                        font: { fontFamily:'Arial', fontSize: '14dp' },
+                        left: '60dp', top: '25dp',
+                    }
+                }
+            ]
+        };
 
-            var listView = Ti.UI.createListView({
-                // Maps myTemplate dictionary to 'template' string
-                templates: { 'template': myTemplate },
-                // Use 'template', that is, the myTemplate dict created earlier
-                // for all items as long as the template property is not defined for an item.
-                defaultItemTemplate: 'template'
-            });
-            var sections = [];
+        var listView = Ti.UI.createListView({
+            // Maps myTemplate dictionary to 'template' string
+            templates: { 'template': myTemplate },
+            // Use 'template', that is, the myTemplate dict created earlier
+            // for all items as long as the template property is not defined for an item.
+            defaultItemTemplate: 'template'
+        });
+        var sections = [];
 
-            var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits / Frutas'});
-            var fruitDataSet = [
-                // the text property of info maps to the text property of the title label
-                // the text property of es_info maps to text property of the subtitle label
-                // the image property of pic maps to the image property of the image view
-                { info: {text: 'Apple'}, es_info: {text: 'Manzana'}, pic: {image: 'apple.png'}},
-                { info: {text: 'Banana'}, es_info: {text: 'Banana'}, pic: {image: 'banana.png'}}
-            ];
-            fruitSection.setItems(fruitDataSet);
-            sections.push(fruitSection);
+        var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits / Frutas'});
+        var fruitDataSet = [
+            // the text property of info maps to the text property of the title label
+            // the text property of es_info maps to text property of the subtitle label
+            // the image property of pic maps to the image property of the image view
+            { info: {text: 'Apple'}, es_info: {text: 'Manzana'}, pic: {image: 'apple.png'}},
+            { info: {text: 'Banana'}, es_info: {text: 'Banana'}, pic: {image: 'banana.png'}}
+        ];
+        fruitSection.setItems(fruitDataSet);
+        sections.push(fruitSection);
 
-            var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables / Verduras'});
-            var vegDataSet = [
-                { info: {text: 'Carrot'}, es_info: {text: 'Zanahoria'}, pic: {image: 'carrot.png'}},
-                { info: {text: 'Potato'}, es_info: {text: 'Patata'}, pic: {image: 'potato.png'}}
-            ];
-            vegSection.setItems(vegDataSet);
-            sections.push(vegSection);
+        var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables / Verduras'});
+        var vegDataSet = [
+            { info: {text: 'Carrot'}, es_info: {text: 'Zanahoria'}, pic: {image: 'carrot.png'}},
+            { info: {text: 'Potato'}, es_info: {text: 'Patata'}, pic: {image: 'potato.png'}}
+        ];
+        vegSection.setItems(vegDataSet);
+        sections.push(vegSection);
 
-            var grainSection = Ti.UI.createListSection({ headerTitle: 'Grains / Granos'});
-            var grainDataSet = [
-                { info: {text: 'Corn'}, es_info: {text: 'Maiz'}, pic: {image: 'corn.png'}},
-                { info: {text: 'Rice'}, es_info: {text: 'Arroz'}, pic: {image: 'rice.png'}}
-            ];
-            grainSection.setItems(grainDataSet);
-            sections.push(grainSection);
+        var grainSection = Ti.UI.createListSection({ headerTitle: 'Grains / Granos'});
+        var grainDataSet = [
+            { info: {text: 'Corn'}, es_info: {text: 'Maiz'}, pic: {image: 'corn.png'}},
+            { info: {text: 'Rice'}, es_info: {text: 'Arroz'}, pic: {image: 'rice.png'}}
+        ];
+        grainSection.setItems(grainDataSet);
+        sections.push(grainSection);
 
-            listView.setSections(sections);
-            win.add(listView);
-            win.open();
+        listView.setSections(sections);
+        win.add(listView);
+        win.open();
+        ```
 
   - title: List View with a pullView (Only supported on iOS since 3.2.0)
     example: |
@@ -1421,158 +1488,160 @@ examples:
         utilized along with the [pull](Titanium.UI.ListView.pull) and [pullend](Titanium.UI.ListView.pullend) events to
         create a refresh control.
 
-            var win = Ti.UI.createWindow({backgroundColor: 'white'});
-            var listView = Ti.UI.createListView({height:'90%', top:0});
-            var sections = [];
+        ``` js
+        var win = Ti.UI.createWindow({backgroundColor: 'white'});
+        var listView = Ti.UI.createListView({height:'90%', top:0});
+        var sections = [];
 
-            var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits'});
-            var fruitDataSet = [
-                {properties: { title: 'Apple'}},
-                {properties: { title: 'Banana'}},
-            ];
-            fruitSection.setItems(fruitDataSet);
-            sections.push(fruitSection);
+        var fruitSection = Ti.UI.createListSection({ headerTitle: 'Fruits'});
+        var fruitDataSet = [
+            {properties: { title: 'Apple'}},
+            {properties: { title: 'Banana'}},
+        ];
+        fruitSection.setItems(fruitDataSet);
+        sections.push(fruitSection);
 
-            var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables'});
-            var vegDataSet = [
-                {properties: { title: 'Carrots'}},
-                {properties: { title: 'Potatoes'}},
-            ];
-            vegSection.setItems(vegDataSet);
+        var vegSection = Ti.UI.createListSection({ headerTitle: 'Vegetables'});
+        var vegDataSet = [
+            {properties: { title: 'Carrots'}},
+            {properties: { title: 'Potatoes'}},
+        ];
+        vegSection.setItems(vegDataSet);
 
-            var fishSection = Ti.UI.createListSection({ headerTitle: 'Fish'});
-            var fishDataSet = [
-                {properties: { title: 'Cod'}},
-                {properties: { title: 'Haddock'}},
-            ];
-            fishSection.setItems(fishDataSet);
-            listView.sections = sections;
-            var refreshCount = 0;
+        var fishSection = Ti.UI.createListSection({ headerTitle: 'Fish'});
+        var fishDataSet = [
+            {properties: { title: 'Cod'}},
+            {properties: { title: 'Haddock'}},
+        ];
+        fishSection.setItems(fishDataSet);
+        listView.sections = sections;
+        var refreshCount = 0;
 
-            function getFormattedDate(){
-                var date = new Date();
-                return date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes();
+        function getFormattedDate(){
+            var date = new Date();
+            return date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes();
+        }
+
+        function resetPullHeader(){
+            actInd.hide();
+            imageArrow.transform=Ti.UI.createMatrix2D();
+            if (refreshCount < 2) {
+                imageArrow.show();
+                labelStatus.text = 'Pull down to refresh...';
+                labelLastUpdated.text = 'Last Updated: ' + getFormattedDate();
+            } else {
+                labelStatus.text = 'Nothing To Refresh';
+                labelLastUpdated.text = 'Last Updated: ' + getFormattedDate();
+                listView.removeEventListener('pull', pullListener);
+                listView.removeEventListener('pullend', pullendListener);
+                eventStatus.text = 'Removed event listeners.';
             }
- 
-            function resetPullHeader(){
-                actInd.hide();
-                imageArrow.transform=Ti.UI.create2DMatrix();
-                if (refreshCount < 2) {
-                    imageArrow.show();
-                    labelStatus.text = 'Pull down to refresh...';
-                    labelLastUpdated.text = 'Last Updated: ' + getFormattedDate();
-                } else {
-                    labelStatus.text = 'Nothing To Refresh';
-                    labelLastUpdated.text = 'Last Updated: ' + getFormattedDate();
-                    listView.removeEventListener('pull', pullListener);
-                    listView.removeEventListener('pullend', pullendListener);
-                    eventStatus.text = 'Removed event listeners.';
-                }
-                listView.setContentInsets({top:0}, {animated:true});
+            listView.setContentInsets({top:0}, {animated:true});
+        }
+
+        function loadTableData()
+        {
+            if (refreshCount == 0) {
+                listView.appendSection(vegSection);
+            } else if (refreshCount == 1) {
+                listView.appendSection(fishSection);
             }
- 
-            function loadTableData()
-            {
+            refreshCount ++;
+            resetPullHeader();
+        }
+
+        function pullListener(e){
+            eventStatus.text = 'EVENT pull FIRED. e.active = '+e.active;
+            if (e.active == false) {
+                var unrotate = Ti.UI.createMatrix2D();
+                imageArrow.animate({transform:unrotate, duration:180});
+                labelStatus.text = 'Pull down to refresh...';
+            } else {
+                var rotate = Ti.UI.createMatrix2D().rotate(180);
+                imageArrow.animate({transform:rotate, duration:180});
                 if (refreshCount == 0) {
-                    listView.appendSection(vegSection);
-                } else if (refreshCount == 1) {
-                    listView.appendSection(fishSection);
-                } 
-                refreshCount ++;
-                resetPullHeader();
-            }
-
-            function pullListener(e){
-                eventStatus.text = 'EVENT pull FIRED. e.active = '+e.active;
-                if (e.active == false) {
-                    var unrotate = Ti.UI.create2DMatrix();
-                    imageArrow.animate({transform:unrotate, duration:180});
-                    labelStatus.text = 'Pull down to refresh...';
+                    labelStatus.text = 'Release to get Vegetables...';
                 } else {
-                    var rotate = Ti.UI.create2DMatrix().rotate(180);
-                    imageArrow.animate({transform:rotate, duration:180});
-                    if (refreshCount == 0) {
-                        labelStatus.text = 'Release to get Vegetables...';
-                    } else {
-                        labelStatus.text = 'Release to get Fish...';
-                    }
+                    labelStatus.text = 'Release to get Fish...';
                 }
             }
+        }
 
-            function pullendListener(e){
-                eventStatus.text = 'EVENT pullend FIRED.';
-             
-                if (refreshCount == 0) {
-                    labelStatus.text = 'Loading Vegetables...';        
-                } else {
-                    labelStatus.text = 'Loading Fish...';
-                }
-                imageArrow.hide();
-                actInd.show();
-                listView.setContentInsets({top:80}, {animated:true});
-                setTimeout(function(){
-                    loadTableData();
-                }, 2000);
+        function pullendListener(e){
+            eventStatus.text = 'EVENT pullend FIRED.';
+
+            if (refreshCount == 0) {
+                labelStatus.text = 'Loading Vegetables...';
+            } else {
+                labelStatus.text = 'Loading Fish...';
             }
+            imageArrow.hide();
+            actInd.show();
+            listView.setContentInsets({top:80}, {animated:true});
+            setTimeout(function(){
+                loadTableData();
+            }, 2000);
+        }
 
-            var tableHeader = Ti.UI.createView({
-                backgroundColor:'#e2e7ed',
-                width:320, height:80
-            });
+        var tableHeader = Ti.UI.createView({
+            backgroundColor:'#e2e7ed',
+            width:320, height:80
+        });
 
-            var border = Ti.UI.createView({
-                backgroundColor:'#576c89',
-                bottom:0,
-                height:2
-            });
-            tableHeader.add(border);
+        var border = Ti.UI.createView({
+            backgroundColor:'#576c89',
+            bottom:0,
+            height:2
+        });
+        tableHeader.add(border);
 
-            var imageArrow = Ti.UI.createImageView({
-                image:'arrow.png',
-                left:20, bottom:10,
-                width:23, height:60
-            });
-            tableHeader.add(imageArrow);
+        var imageArrow = Ti.UI.createImageView({
+            image:'arrow.png',
+            left:20, bottom:10,
+            width:23, height:60
+        });
+        tableHeader.add(imageArrow);
 
-            var labelStatus = Ti.UI.createLabel({
-                color:'#576c89',
-                font:{fontSize:13, fontWeight:'bold'},
-                text:'Pull down to refresh...',
-                textAlign:'center',
-                left:55, bottom:30,
-                width:200
-            });
-            tableHeader.add(labelStatus);
+        var labelStatus = Ti.UI.createLabel({
+            color:'#576c89',
+            font:{fontSize:13, fontWeight:'bold'},
+            text:'Pull down to refresh...',
+            textAlign:'center',
+            left:55, bottom:30,
+            width:200
+        });
+        tableHeader.add(labelStatus);
 
-            var labelLastUpdated = Ti.UI.createLabel({
-                color:'#576c89',
-                font:{fontSize:12},
-                text:'Last Updated: ' + getFormattedDate(),
-                textAlign:'center',
-                left:55, bottom:15,
-                width:200
-            });
-            tableHeader.add(labelLastUpdated);
+        var labelLastUpdated = Ti.UI.createLabel({
+            color:'#576c89',
+            font:{fontSize:12},
+            text:'Last Updated: ' + getFormattedDate(),
+            textAlign:'center',
+            left:55, bottom:15,
+            width:200
+        });
+        tableHeader.add(labelLastUpdated);
 
-            var actInd = Ti.UI.createActivityIndicator({
-                left:20, bottom:13,
-                width:30, height:30
-            });
-            tableHeader.add(actInd);
-            listView.pullView = tableHeader;
-            listView.addEventListener('pull', pullListener);
-            listView.addEventListener('pullend',pullendListener);
+        var actInd = Ti.UI.createActivityIndicator({
+            left:20, bottom:13,
+            width:30, height:30
+        });
+        tableHeader.add(actInd);
+        listView.pullView = tableHeader;
+        listView.addEventListener('pull', pullListener);
+        listView.addEventListener('pullend',pullendListener);
 
-            var eventStatus = Ti.UI.createLabel({
-                font:{fontSize:13, fontWeight:'bold'},
-                text: 'Event data will show here',
-                bottom:0,
-                height:'10%'
-            })
+        var eventStatus = Ti.UI.createLabel({
+            font:{fontSize:13, fontWeight:'bold'},
+            text: 'Event data will show here',
+            bottom:0,
+            height:'10%'
+        })
 
-            win.add(listView);
-            win.add(eventStatus);
-            win.open();
+        win.add(listView);
+        win.add(eventStatus);
+        win.open();
+        ```
 
   - title: Alloy XML Markup
     example: |
@@ -1580,63 +1649,65 @@ examples:
         Alloy 1.2.0 and later.
 
         `app/views/index.xml`:
+        ``` xml
+        <Alloy>
+            <Window backgroundColor="white">
+                <ListView id="listView" defaultItemTemplate="template">
 
-            <Alloy>
-                <Window backgroundColor="white">
-                    <ListView id="listView" defaultItemTemplate="template">
+                    <!-- The Templates tag sets the ListView's templates property -->
 
-                        <!-- The Templates tag sets the ListView's templates property -->
+                    <Templates>
 
-                        <Templates>
+                        <!-- Define your item templates within the Templates tags or use the
+                              Require tag to include a view that only contains an ItemTemplate -->
 
-                            <!-- Define your item templates within the Templates tags or use the
-                                 Require tag to include a view that only contains an ItemTemplate -->
+                        <ItemTemplate name="template">
+                            <ImageView bindId="pic" id="icon" />
+                            <Label bindId="info" id="title" />
+                            <Label bindId="es_info" id="subtitle" />
+                        </ItemTemplate>
 
-                            <ItemTemplate name="template">
-                                <ImageView bindId="pic" id="icon" />
-                                <Label bindId="info" id="title" />
-                                <Label bindId="es_info" id="subtitle" />
-                            </ItemTemplate>
+                    </Templates>
 
-                        </Templates>
+                    <ListSection headerTitle="Fruit / Frutas">
 
-                        <ListSection headerTitle="Fruit / Frutas">
+                        <!-- You can specify any ListItem or ListDataItem properties in ListItem -->
 
-                            <!-- You can specify any ListItem or ListDataItem properties in ListItem -->
+                        <!-- Specify data to bind to the item template with inline attributes
+                              defined as <bindId>:<Ti.UI.Component.property> -->
 
-                            <!-- Specify data to bind to the item template with inline attributes
-                                 defined as <bindId>:<Ti.UI.Component.property> -->
-
-                            <ListItem info:text="Apple" es_info:text="Manzana" pic:image="/apple.png" />
-                            <ListItem info:text="Banana" es_info:text="Banana" pic:image="/banana.png" />
-                        </ListSection>
-                        <ListSection headerTitle="Vegetables / Verduras">
-                            <ListItem info:text="Carrot" es_info:text="Zanahoria" pic:image="/carrot.png" />
-                            <ListItem info:text="Potato" es_info:text="Patata" pic:image="/potato.png" />
-                        </ListSection>
-                        <ListSection headerTitle="Grains / Granos">
-                            <ListItem info:text="Corn" es_info:text="Maiz" pic:image="/corn.png" />
-                            <ListItem info:text="Rice" es_info:text="Arroz" pic:image="/rice.png" />
-                        </ListSection>
-                    </ListView>
-                </Window>
-            </Alloy>
+                        <ListItem info:text="Apple" es_info:text="Manzana" pic:image="/apple.png" />
+                        <ListItem info:text="Banana" es_info:text="Banana" pic:image="/banana.png" />
+                    </ListSection>
+                    <ListSection headerTitle="Vegetables / Verduras">
+                        <ListItem info:text="Carrot" es_info:text="Zanahoria" pic:image="/carrot.png" />
+                        <ListItem info:text="Potato" es_info:text="Patata" pic:image="/potato.png" />
+                    </ListSection>
+                    <ListSection headerTitle="Grains / Granos">
+                        <ListItem info:text="Corn" es_info:text="Maiz" pic:image="/corn.png" />
+                        <ListItem info:text="Rice" es_info:text="Arroz" pic:image="/rice.png" />
+                    </ListSection>
+                </ListView>
+            </Window>
+        </Alloy>
+        ```
 
         `app/styles/index.tss`:
-
-            "#icon" : {
-                width: '50dp', height: '50dp', left: 0
-            },
-            "#title" : {
-                color: 'black',
-                font: { fontFamily:'Arial', fontSize: '20dp', fontWeight:'bold' },
-                left: '60dp', top: 0
-            },
-            "#subtitle" : {
-                color: 'gray',
-                font: { fontFamily:'Arial', fontSize: '14dp' },
-                left: '60dp', top: '25dp'
-            }
+        ``` js
+        "#icon" : {
+            width: '50dp', height: '50dp', left: 0
+        },
+        "#title" : {
+            color: 'black',
+            font: { fontFamily:'Arial', fontSize: '20dp', fontWeight:'bold' },
+            left: '60dp', top: 0
+        },
+        "#subtitle" : {
+            color: 'gray',
+            font: { fontFamily:'Arial', fontSize: '14dp' },
+            left: '60dp', top: '25dp'
+        }
+        ```
 
   - title: Alloy example of ListView properties
     example: |
@@ -1646,61 +1717,65 @@ examples:
         properties may be declared as XML elements inline with the `ListView` element.  The example
         below demonstrates how to use `searchView`, `headerView` and `footerView`.
 
-            <Alloy>
-                <Window fullscreen="true">
-                    <ListView>
-                        <!-- Sets ListView's searchView property.
-                             For Android, you can also do <SearchView platform="android" />
-                             to use a Ti.UI.Android.SearchView instead of a search bar. -->
-                        <SearchBar barColor="#000" />
+        ``` xml
+        <Alloy>
+            <Window fullscreen="true">
+                <ListView>
+                    <!-- Sets ListView's searchView property.
+                          For Android, you can also do <SearchView platform="android" />
+                          to use a Ti.UI.Android.SearchView instead of a search bar. -->
+                    <SearchBar barColor="#000" />
 
-                        <!-- Sets ListView's headerView property -->
-                        <HeaderView>
-                            <View backgroundColor="#DDD" height="Ti.UI.SIZE">
-                                <Label>Header View</Label>
-                            </View>>
-                        </HeaderView>
+                    <!-- Sets ListView's headerView property -->
+                    <HeaderView>
+                        <View backgroundColor="#DDD" height="Ti.UI.SIZE">
+                            <Label>Header View</Label>
+                        </View>>
+                    </HeaderView>
 
-                        <ListSection>
-                            <ListItem title="Papaya" searchableText="Papaya"/>
-                            <ListItem title="Peach" searchableText="Peach"/>
-                            <ListItem title="Pear" searchableText="Pear"/>
-                            <ListItem title="Persimmon" searchableText="Persimmon"/>
-                            <ListItem title="Pineapple" searchableText="Pineapple"/>
-                            <ListItem title="Pluot" searchableText="Pluto"/>
-                            <ListItem title="Pomegranate" searchableText="Pomegranate"/>
-                        </ListSection>
+                    <ListSection>
+                        <ListItem title="Papaya" searchableText="Papaya"/>
+                        <ListItem title="Peach" searchableText="Peach"/>
+                        <ListItem title="Pear" searchableText="Pear"/>
+                        <ListItem title="Persimmon" searchableText="Persimmon"/>
+                        <ListItem title="Pineapple" searchableText="Pineapple"/>
+                        <ListItem title="Pluot" searchableText="Pluto"/>
+                        <ListItem title="Pomegranate" searchableText="Pomegranate"/>
+                    </ListSection>
 
-                        <!-- Sets ListView's footerView property -->
-                        <FooterView>
-                            <View backgroundColor="#DDD" height="Ti.UI.SIZE">
-                                <Label>Footer View</Label>
-                            </View>
-                        </FooterView>
-                    </ListView>
-                </Window>
-            </Alloy>
+                    <!-- Sets ListView's footerView property -->
+                    <FooterView>
+                        <View backgroundColor="#DDD" height="Ti.UI.SIZE">
+                            <Label>Footer View</Label>
+                        </View>
+                    </FooterView>
+                </ListView>
+            </Window>
+        </Alloy>
+        ```
 
-  - title: Alloy example of <PullView> element
+  - title: Alloy example of `<PullView>` element
     example: |
         The example below demonstrates how to use a `<PullView>` Alloy element.
 
-            <!-- views/index.xml -->
-            <Alloy>
-                <Window class="container" >
-                    <ListView id="list">
-                        <ListSection>
-                            <ListItem title="Number 1"></ListItem>
-                            <ListItem title="Number 2"></ListItem>
-                        </ListSection>
-                        <PullView>
-                            <View backgroundColor="red" height="50">
-                                <Label>Release to reload</Label>
-                            </View>
-                        </PullView>
-                    </ListView>
-                </Window>
-            </Alloy>
+        ``` xml
+        <!-- views/index.xml -->
+        <Alloy>
+            <Window class="container" >
+                <ListView id="list">
+                    <ListSection>
+                        <ListItem title="Number 1"></ListItem>
+                        <ListItem title="Number 2"></ListItem>
+                    </ListSection>
+                    <PullView>
+                        <View backgroundColor="red" height="50">
+                            <Label>Release to reload</Label>
+                        </View>
+                    </PullView>
+                </ListView>
+            </Window>
+        </Alloy>
+        ```
 
 ---
 name: ListViewAnimationProperties
@@ -1724,7 +1799,7 @@ properties:
     type: Number
     constants: Titanium.UI.iOS.RowAnimationStyle.*
     default: |
-        If `animated` is `true` but no `animationStyle` is specified, the style defaults to 
+        If `animated` is `true` but no `animationStyle` is specified, the style defaults to
         [FADE](Titanium.UI.iOS.RowAnimationStyle.FADE).
   - name: position
     summary: Specifies what position to scroll the selected cell to.
@@ -1732,7 +1807,7 @@ properties:
     constants: [Titanium.UI.iOS.ListViewScrollPosition.*, Titanium.UI.Windows.ListViewScrollPosition.*]
     default: Titanium.UI.iOS.ListViewScrollPosition.NONE
 
----      
+---
 name: ListViewIndexEntry
 summary: A simple object that represents an index entry in a `ListView`.
 description: |
@@ -1748,32 +1823,15 @@ properties:
     type: Number
 
 ---
-name: ListViewContentInsetOption
-summary: Optional parameter for [setContentInsets](Titanium.UI.ListView.setContentInsets) method.
-description: |
-    On iOS, the optional parameters `animated` and `duration` to enable the animation and duration 
-    for animation while the content insets are updated. For example
-
-        setContentInset({top:50,bottom:100}, {animated:true, duration:3000})
-since: 3.2.0
-platforms: [iphone, ipad]
-properties:
-  - name: animated
-    summary: Determines whether the list view's content inset change is animated.
-    type: Boolean
-    default: false
-  - name: duration
-    summary: The duration in `milliseconds` for animation while the content inset is  being changed.
-    type: Number
-
----     
 name: ListViewMarkerProps
 summary: The parameter for [setMarker](Titanium.UI.ListView.setMarker) and [addMarker](Titanium.UI.ListView.addMarker) methods.
 description: |
     Use this in conjunction with [setMarker](Titanium.UI.ListView.setMarker) and [addMarker](Titanium.UI.ListView.addMarker) methods. For example:
 
-        setMarker({sectionIndex:5, itemIndex:10});
-        addMarker({sectionIndex:7, itemIndex: 2});
+    ``` js
+    setMarker({ sectionIndex: 5, itemIndex: 10 });
+    addMarker({ sectionIndex: 7, itemIndex: 2 });
+    ```
 since: 3.2.0
 platforms: [iphone, ipad, android]
 properties:
@@ -1782,34 +1840,6 @@ properties:
     type: Number
   - name: itemIndex
     summary: The itemIndex of the reference item.
-    type: Number
-
----
-name: ListViewEdgeInsets
-summary: The parameter for [setContentInsets](Titanium.UI.TableView.setContentInsets) method.
-description: |
-    On iOS, the parameter `edgeInsets` can be specified to set the distance(`top`, `bottom`,
-    `right`, `left`) that the content view is inset from the enclosing scroll view of the list view.
-    For example
-
-        setContentInset({top:50,bottom:10,right:10,left:10}, {animated:true})
-since: 3.2.0
-platforms: [iphone, ipad]
-properties:
-  - name: top
-    summary: Value specifying the top insets for the enclosing scroll view of the list view.
-    type: Number
-    
-  - name: left
-    summary: Value specifying the left insets for the enclosing scroll view of the list view.
-    type: Number
-    
-  - name: right
-    summary: Value specifying the right insets for the enclosing scroll view of the list view.
-    type: Number
-    
-  - name: bottom
-    summary: Value specifying the bottom insets for the enclosing scroll view of the list view.
     type: Number
 
 ---
@@ -1833,3 +1863,21 @@ properties:
   - name: itemId
     summary: The item ID bound to the list item that generated the event.
     type: String
+
+---
+name: SelectedItem
+summary: The arguments for the <Titanium.UI.ListView.itemsselected> event.
+since: 8.2.0
+platforms: [iphone, ipad]
+properties:
+  - name: section
+    summary: List section if the item is contained in a list section.
+    type: Titanium.UI.ListSection
+
+  - name: sectionIndex
+    summary: Section index.
+    type: Number
+
+  - name: itemIndex
+    summary: Item index.
+    type: Number
