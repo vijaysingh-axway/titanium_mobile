@@ -72,7 +72,7 @@
     "js-yaml": "^3.12.0",
     "mocha": "^5.2.0",
     "pagedown": "~1.1.0",
-    "ssri": "^6.0.1"
+    "ssri": "^8.0.1"
   },
   "repository": {
     "type": "git",
